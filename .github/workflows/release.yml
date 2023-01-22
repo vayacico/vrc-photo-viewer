@@ -1,0 +1,87 @@
+on:
+  workflow_dispatch:
+
+name: Release
+
+jobs:
+  release:
+    name: Release and upload
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          node-version: 16
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: npm ci
+        run: |
+          npm ci
+
+      - name: generate licence file
+        id: licence
+        # package.jsonに定義されているライブラリからファイルを出力、ボイラープレートとアイコンのライセンスを手動で追加
+        run: |
+          npx license-checker-rseidelsohn --plainVertical --direct | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8
+          npx license-checker-rseidelsohn --start .\release\app\ --plainVertical --direct --excludePackages "vrc-photo-viewer" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
+          echo "`n`nelectron-react-boilerplate/electron-react-boilerplate v4.6.0`n" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
+          curl.exe https://raw.githubusercontent.com/electron-react-boilerplate/electron-react-boilerplate/f99a45d2a2daf6f7e6dd4f7bc9d453bf44a384d8/LICENSE | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
+          echo "`n`nmicrosoft/fluentui-emoji`n" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
+          curl.exe https://raw.githubusercontent.com/microsoft/fluentui-emoji/252e16f8dd1400bb3ba86384b474742b4fef089f/LICENSE | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
+          git diff --exit-code
+        continue-on-error: true
+
+      - name: commit if need
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .
+          git commit --author=. -m '[skip ci] generate licence'
+          git push
+        if: steps.licence.outcome == 'failure'
+
+      - name: package
+        run: |
+          $APP_NAME=cat .\release\app\package.json | jq -r '.name'
+          $APP_VERSION=cat .\release\app\package.json | jq -r '.version'
+          $GIT_HASH=git rev-parse --short HEAD
+          echo -n "$APP_NAME $APP_VERSION ($GIT_HASH)" | Out-File -FilePath  .\assets\version.txt -Encoding utf8
+          npm run postinstall
+          npm run package
+          echo "build_binary_name=$(Get-ChildItem  ./release/build/*.exe -Name)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "build_binary_path=./release/build/$(Get-ChildItem  ./release/build/*.exe -Name)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Create Tag
+        run: |
+          $APP_VERSION=cat .\release\app\package.json | jq -r '.version'
+          echo "app_version=$APP_VERSION" | Out-File -FilePath $env:GITHUB_ENV -Append
+          git tag $APP_VERSION
+          git push origin $APP_VERSION
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          node-version: 16
+          tag_name: ${{ env.app_version }}
+          release_name: ${{ env.app_version }}
+          draft: true
+          prerelease: true
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          node-version: 16
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.build_binary_path }}
+          asset_name: ${{ env.build_binary_name }}
+          asset_content_type: application/exe
