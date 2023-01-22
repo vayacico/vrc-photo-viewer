@@ -8,9 +8,9 @@ import {
   WorldData,
   WorldResponse,
 } from '../../dto/ActivityLog';
-import ActivityServiceImpl from '../application/impl/ActivityServiceImpl';
-import ThumbnailServiceImpl from '../application/impl/ThumbnailServiceImpl';
-import FileSettingsServiceImpl from '../application/impl/FileSettingsServiceImpl';
+import ActivityService from '../application/ActivityService';
+import ThumbnailService from '../application/ThumbnailService';
+import FileSettingsService from '../application/FileSettingsService';
 import DatabaseErrorException from '../domain/model/exception/DatabaseErrorException';
 import { ApplyResponse, SettingForm } from '../../dto/SettingForm';
 import DatabaseFilePathNotSetException from '../domain/model/exception/DatabaseFilePathNotSetException';
@@ -23,9 +23,9 @@ import BrowserWindow = Electron.BrowserWindow;
  * @param browserWindow
  */
 const registerHandler = (browserWindow: BrowserWindow | null) => {
-  const activityService = new ActivityServiceImpl();
-  const thumbnailService = new ThumbnailServiceImpl();
-  const settingService = new FileSettingsServiceImpl();
+  const activityService = new ActivityService();
+  const thumbnailService = new ThumbnailService();
+  const settingService = new FileSettingsService();
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
