@@ -1,11 +1,11 @@
 {
   "name": "vrc-photo-viewer",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "photo viewer for vrchat",
   "main": "./dist/main/main.js",
   "author": {
     "name": "vayacico",
-    "url": "https://github.com/vayacico/app-viewer-vrc-photo2"
+    "url": "https://github.com/vayacico/vrc-photo-viewer"
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",

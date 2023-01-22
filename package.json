@@ -1,5 +1,5 @@
 {
-  "name": "app-viewer-vrc-photo",
+  "name": "vrc-photo-viewer",
   "description": "photo viewer for vrchat",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -94,7 +94,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vayacico/app-viewer-vrc-photo2.git"
+    "url": "git+https://github.com/vayacico/vrc-photo-viewer.git"
   },
   "author": {
     "name": "vayacico"
