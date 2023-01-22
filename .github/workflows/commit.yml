@@ -45,5 +45,5 @@ jobs:
       - name: publish
         uses: actions/upload-artifact@v3
         with:
-          name: app-viewer-vrc-photo
+          name: vrc-photo-viewer
           path: ./release/build/*.exe

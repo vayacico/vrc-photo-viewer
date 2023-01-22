@@ -284,11 +284,11 @@ const Setting: React.FC<Props> = (props) => {
                 <LinkText
                   onClick={() =>
                     window.service.application.openUrlInBrowser(
-                      'https://github.com/vayacico/app-viewer-vrc-photo2'
+                      'https://github.com/vayacico/vrc-photo-viewer'
                     )
                   }
                 >
-                  https://github.com/vayacico/app-viewer-vrc-photo2
+                  https://github.com/vayacico/vrc-photo-viewer
                 </LinkText>
               </Description>
             </Area>
