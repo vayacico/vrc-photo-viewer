@@ -1,13 +1,12 @@
 import * as electron from 'electron';
 import { dialog } from 'electron';
-import FileSettingService from '../FileSettingService';
-import SettingsRepositoryImpl from '../../infrastructures/repository/SettingsRepositoryImpl';
-import SettingRepository from '../../domain/model/SettingRepository';
-import { SettingForm } from '../../../dto/SettingForm';
-import ActivityLogRepository from '../../domain/model/ActivityLogRepository';
-import ActivityLogRepositoryImpl from '../../infrastructures/repository/ActivityLogRepositoryImpl';
+import SettingsRepositoryImpl from '../infrastructures/repository/SettingsRepositoryImpl';
+import SettingRepository from '../domain/model/SettingRepository';
+import { SettingForm } from '../../dto/SettingForm';
+import ActivityLogRepository from '../domain/model/ActivityLogRepository';
+import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 
-export default class FileSettingsServiceImpl implements FileSettingService {
+export default class FileSettingsService {
   settingRepository: SettingRepository;
 
   activityLogRepository: ActivityLogRepository;
