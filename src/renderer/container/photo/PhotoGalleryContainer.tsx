@@ -153,7 +153,7 @@ const PhotoGalleryContainer: React.FC = () => {
     }[];
     const tmpRowIndexToItemIndexMap = new Map<number, string>();
 
-    if (photo === null) {
+    if (photo === null || isResizing) {
       const imageRow: JSX.Element[] = [];
       for (let i = 0; i < photoNumPerRow; i += 1) {
         imageRow.push(<Skeleton width="100%" height="100%" />);

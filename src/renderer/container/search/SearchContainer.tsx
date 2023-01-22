@@ -222,7 +222,7 @@ const SearchContainer: React.FC = () => {
     }[];
     const tmpRowIndexToItemIndexMap = new Map<number, string>();
 
-    if (isLoading) {
+    if (isLoading || isResizing) {
       const imageRow: JSX.Element[] = [];
       for (let i = 0; i < photoNumPerRow; i += 1) {
         imageRow.push(<Skeleton width={imageWidth} height={imageHeight - 8} />);

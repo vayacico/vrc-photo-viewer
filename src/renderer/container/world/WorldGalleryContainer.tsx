@@ -140,7 +140,7 @@ const WorldGalleryContainer: React.FC = () => {
     }[];
     const tmpRowIndexToItemIndexMap = new Map<number, string>();
 
-    if (world === null) {
+    if (world === null || isResizing) {
       const imageRow: JSX.Element[] = [];
       for (let i = 0; i < photoNumPerRow; i += 1) {
         imageRow.push(<Skeleton width={imageWidth} height={imageHeight - 8} />);
