@@ -1,1 +1,1 @@
-vrc-photo-viewer 1.0.0 (7f259dc)
+vrc-photo-viewer 1.0.0 (73d5be2)
