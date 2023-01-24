@@ -24,7 +24,7 @@ Displays visited worlds grouped by date. The most recent photo taken in the worl
 Search for photos and worlds by user name or world name. If a user name is specified, photos and worlds visited together
 are displayed.
 
-### :construction_worker: develop
+## :construction_worker: develop
 
 This application is developed based on [electron-react-boilerplate](https://electron-react-boilerplate.js.org).
 
