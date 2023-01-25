@@ -1,7 +1,7 @@
 # vrc photo viewer
 
 ![workflow](https://github.com/vayacico/vrc-photo-viewer/actions/workflows/commit.yml/badge.svg)
-[![Known Vulnerabilities](https://snyk.io/test/github/vayacico/vrc-photo-viewer/badge.svg)]
+![Known Vulnerabilities](https://snyk.io/test/github/vayacico/vrc-photo-viewer/badge.svg)
 
 ## :blue_book: feature
 This photo viewer displays photos based on a database created
