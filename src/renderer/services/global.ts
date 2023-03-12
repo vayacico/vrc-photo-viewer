@@ -13,5 +13,6 @@ declare global {
       settings: SettingService;
       application: ApplicationService;
     };
+    environment: 'electron' | 'browser';
   }
 }

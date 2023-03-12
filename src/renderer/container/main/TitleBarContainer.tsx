@@ -5,6 +5,9 @@ import { pageModeActions } from '../../reducers/pageMode';
 const TitleBarContainer: React.FC = () => {
   const dispatch = useDispatch();
 
+  if (window.environment === 'browser') {
+    return null;
+  }
   const onClickBackButton = () => {
     dispatch(pageModeActions.back());
   };
