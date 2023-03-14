@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "sharp": "^0.30.7",
-    "sqlite3": "^5.0.11",
+    "sqlite3": "^5.1.5",
     "typeorm": "^0.3.10"
   },
   "license": "MIT"
