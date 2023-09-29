@@ -13,7 +13,7 @@
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "dependencies": {
-    "sharp": "^0.30.7",
+    "sharp": "^0.32.6",
     "sqlite3": "^5.1.5",
     "typeorm": "^0.3.14"
   },
