@@ -1,6 +1,6 @@
 {
   "name": "vrc-photo-viewer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "photo viewer for vrchat",
   "main": "./dist/main/main.js",
   "author": {
