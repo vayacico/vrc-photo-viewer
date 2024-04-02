@@ -4,22 +4,22 @@ version: v1.25.0
 ignore:
   'SNYK-JS-HTTPCACHESEMANTICS-3248783':
     - '*':
-        reason: sqlite3sqlite3で未対応なため
+        reason: sqlite3で未対応なため
         expires: 2024-07-02T00:00:00.000Z
         created: 2024-04-02T13:14:54.018Z
   'SNYK-JS-INFLIGHT-6095116':
     - '*':
-        reason: sqlite3sqlite3で未対応なため
+        reason: sqlite3で未対応なため
         expires: 2024-07-02T00:00:00.000Z
         created: 2024-04-02T13:14:54.018Z
   'SNYK-JS-IP-6240864':
     - '*':
-        reason: sqlite3sqlite3で未対応なため
+        reason: sqlite3で未対応なため
         expires: 2024-07-02T00:00:00.000Z
         created: 2024-04-02T13:14:54.018Z
   'SNYK-JS-TAR-6476909':
     - '*':
-        reason: sqlite3sqlite3で未対応なため
+        reason: sqlite3で未対応なため
         expires: 2024-07-02T00:00:00.000Z
         created: 2024-04-02T13:14:54.018Z
 patch: {}
