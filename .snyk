@@ -22,4 +22,9 @@ ignore:
         reason: license-checker-rseidelsohnで未対応なため
         expires: 2024-07-02T00:00:00.000Z
         created: 2024-04-02T13:12:56.057Z
+  SNYK-JS-JSON5-3182856:
+    - '*':
+        reason: i18next-node-fs-backendで未対応なため
+        expires: 2024-07-02T00:00:00.000Z
+        created: 2024-04-02T13:12:56.057Z
 patch: {}
