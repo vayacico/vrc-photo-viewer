@@ -1,0 +1,68 @@
+{
+  "error": {
+    "dbFileNotSet": "Please set the database file location.",
+    "directoryNotSet": "Please set the photo file location.",
+    "unknown": "An unknown error occurred while opening the database file."
+  },
+  "toast": {
+    "scanning": {
+      "description": "Scanning images now."
+    },
+    "scanFinished": {
+      "description": "Photos updated."
+    },
+    "scanFinishedWithNewPhoto": {
+      "description": "New {NUMBER} photo(s) found."
+    },
+    "scanFinishedWithNoPhoto": {
+      "heading": "No photos found",
+      "description": "Please check the photo directory settings."
+    },
+    "notConfigured": {
+      "heading": "Not configured",
+      "description": "Please set the database file location in the settings menu."
+    }
+  },
+  "setting": {
+    "tab": {
+      "file": "File",
+      "setting": "Settings",
+      "about": "About"
+    },
+    "db": {
+      "heading": "Database",
+      "description": "Set the location for your VRChatActivityTools database file (e.g., VRChatActivityLog.db)."
+    },
+    "photoFolders": {
+      "heading": "Photo Folders",
+      "description": "Set the folder that contains the photos to be scanned."
+    },
+    "language": {
+      "heading": "Language",
+      "description": "Select your preferred language for the application interface from the list."
+    },
+    "settingFile": {
+      "heading": "Settings File",
+      "description": "Open and edit the application's configuration file (in JSON format).",
+      "button": "Open file"
+    },
+    "thumbnailCache": {
+      "heading": "Thumbnail Cache",
+      "description": "Access this folder to manage thumbnail cache files. Deleting this folder will prompt the app to regenerate thumbnails for all images.",
+      "button": "Open folder"
+    },
+    "version": {
+      "heading": "Version"
+    },
+    "license": {
+      "heading": "License",
+      "description": "This application incorporates open-source software. Details can be found here."
+    },
+    "apply": {
+      "button": "Apply",
+      "loading": "Loading...",
+      "successMessage": "Success to load database and scan photo.",
+      "errorMessage": "Failed to load database or scan photo."
+    }
+  }
+}
