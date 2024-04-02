@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useRef } from 'react';
 import { useToast } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
 import Contents from '../../component/main/Contents';
 import { State } from '../../reducers';
 import PhotoGalleryContainer from '../photo/PhotoGalleryContainer';
@@ -32,6 +33,7 @@ const ContentContainer: React.FC = () => {
   const scanningToastRef = useRef<number | string>();
   const errorToastRef = useRef<number | string>();
   const toast = useToast();
+  const { t, i18n: i18nReact } = useTranslation();
 
   // エラー状態が変化したらトーストを表示（写真取得）
   useEffect(() => {
@@ -89,9 +91,10 @@ const ContentContainer: React.FC = () => {
       }
       if (response.photoCount > response.oldPhotoCount) {
         toast({
-          description: `${`new ${
-            response.photoCount - response.oldPhotoCount
-          }`} photos found.`,
+          description: t('toast.scanFinishedWithNewPhoto.description').replace(
+            '{NUMBER}',
+            (response.photoCount - response.oldPhotoCount).toString()
+          ),
           position: 'bottom-right',
           status: 'success',
           isClosable: false,
@@ -101,7 +104,7 @@ const ContentContainer: React.FC = () => {
         });
       } else {
         toast({
-          description: `photo updated`,
+          description: t('toast.scanFinished.description'),
           position: 'bottom-right',
           status: 'success',
           isClosable: false,
@@ -112,8 +115,8 @@ const ContentContainer: React.FC = () => {
       }
       if (response.photoCount === 0) {
         toast({
-          title: 'No photo found.',
-          description: 'Check photo directory settings.',
+          title: t('toast.scanFinishedWithNoPhoto.heading'),
+          description: t('toast.scanFinishedWithNoPhoto.description'),
           position: 'bottom-right',
           status: 'warning',
           isClosable: false,
@@ -142,12 +145,15 @@ const ContentContainer: React.FC = () => {
   // 初回共通データの読み込み
   useEffect(() => {
     const init = async () => {
+      const lng = await window.service.settings.getLanguageSetting();
+      await i18nReact.changeLanguage(lng);
+
       const databaseFilePath =
         await window.service.settings.getDbFileLocation();
       if (!databaseFilePath) {
         toast({
-          title: 'No configured',
-          description: 'Set database file location in setting menu',
+          title: t('toast.notConfigured.heading'),
+          description: t('toast.notConfigured.description'),
           position: 'bottom-right',
           status: 'info',
           isClosable: false,
@@ -160,7 +166,7 @@ const ContentContainer: React.FC = () => {
         dispatch(worldDataActions.clear());
       } else {
         scanningToastRef.current = toast({
-          description: 'Scanning images',
+          description: t('toast.scanning.description'),
           position: 'bottom-right',
           status: 'loading',
           isClosable: false,

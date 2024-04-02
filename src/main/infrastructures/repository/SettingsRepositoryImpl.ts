@@ -14,6 +14,29 @@ export default class SettingsRepositoryImpl implements SettingRepository {
   }
 
   /**
+   * 言語設定を更新
+   * @param lng
+   */
+  async updateLanguage(lng: 'ja' | 'en'): Promise<void> {
+    this.store.set('language', lng);
+  }
+
+  /**
+   * 言語設定を取得
+   */
+  async getLanguage(): Promise<'ja' | 'en'> {
+    try {
+      const result = this.store.get('language') as 'ja' | 'en';
+      if (result === 'ja' || result === 'en') {
+        return result;
+      }
+      return 'en';
+    } catch (e) {
+      return 'en';
+    }
+  }
+
+  /**
    * アプリケーション設定ファイルの場所を取得
    */
   async getSettingFileLocation(): Promise<string> {

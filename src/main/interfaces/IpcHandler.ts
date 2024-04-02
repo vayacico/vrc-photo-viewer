@@ -2,6 +2,7 @@ import * as electron from 'electron';
 import { app, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs/promises';
+import i18next from 'i18next';
 import {
   ErrorResponse,
   PhotoResponse,
@@ -10,7 +11,7 @@ import {
 } from '../../dto/ActivityLog';
 import ActivityService from '../application/ActivityService';
 import ThumbnailService from '../application/ThumbnailService';
-import FileSettingsService from '../application/FileSettingsService';
+import SettingsService from '../application/SettingsService';
 import DatabaseErrorException from '../domain/model/exception/DatabaseErrorException';
 import { ApplyResponse, SettingForm } from '../../dto/SettingForm';
 import DatabaseFilePathNotSetException from '../domain/model/exception/DatabaseFilePathNotSetException';
@@ -25,7 +26,7 @@ import BrowserWindow = Electron.BrowserWindow;
 const registerHandler = (browserWindow: BrowserWindow | null) => {
   const activityService = new ActivityService();
   const thumbnailService = new ThumbnailService();
-  const settingService = new FileSettingsService();
+  const settingService = new SettingsService();
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -57,14 +58,14 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'FILE_NOT_SET',
-          message: 'please set database file location.',
+          message: i18next.t('error.dbFileNotSet'),
         } as ErrorResponse;
       }
       if (e instanceof PhotoDirectoryNotSetException) {
         return {
           status: 'failed',
           errorCode: 'DIRECTORY_NOT_SET',
-          message: 'please set photo file location.',
+          message: i18next.t('error.directoryNotSet'),
         } as ErrorResponse;
       }
       if (e instanceof DatabaseErrorException) {
@@ -77,7 +78,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: 'unknown error occurred when opening database file.',
+        message: i18next.t('error.unknown'),
       } as ErrorResponse;
     }
   });
@@ -102,7 +103,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: 'unknown error occurred when scanning photo file.',
+        message: i18next.t('error.unknown'),
       } as ErrorResponse;
     }
   });
@@ -122,7 +123,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: 'unknown error occurred when opening database file.',
+        message: i18next.t('error.unknown'),
       } as ErrorResponse;
     }
   });
@@ -147,7 +148,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'FILE_NOT_SET',
-          message: 'please set database file location.',
+          message: i18next.t('error.dbFileNotSet'),
         } as ErrorResponse;
       }
       if (e instanceof DatabaseErrorException) {
@@ -161,13 +162,13 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'DIRECTORY_NOT_SET',
-          message: 'please set photo file location.',
+          message: i18next.t('error.directoryNotSet'),
         } as ErrorResponse;
       }
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: 'unknown error occurred when opening database file.',
+        message: i18next.t('error.unknown'),
       } as ErrorResponse;
     }
   });
@@ -201,7 +202,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: 'unknown error occurred when opening database file.',
+          message: i18next.t('error.unknown'),
         } as ErrorResponse;
       }
     }
@@ -236,7 +237,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: 'unknown error occurred when opening database file.',
+          message: i18next.t('error.unknown'),
         } as ErrorResponse;
       }
     }
@@ -269,7 +270,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: 'unknown error occurred when opening database file.',
+          message: i18next.t('error.unknown'),
         } as ErrorResponse;
       }
     }
@@ -302,7 +303,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: 'unknown error occurred when opening database file.',
+          message: i18next.t('error.unknown'),
         } as ErrorResponse;
       }
     }
@@ -362,11 +363,19 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         }
         return {
           status: 'failed',
-          message: 'unknown error occurred when opening database file.',
+          message: i18next.t('error.unknown'),
         } as ApplyResponse;
       }
     }
   );
+  // 言語設定取得
+  ipcMain.handle('GET_LANGUAGE', async () => {
+    return settingService.getLanguageSetting();
+  });
+  // 言語設定変更
+  ipcMain.handle('UPDATE_LANGUAGE', async (_event, lng: 'ja' | 'en') => {
+    return settingService.updateLanguageSetting(lng);
+  });
   // URLをブラウザで開く
   ipcMain.handle('APPLICATION_OPEN_IN_BROWSER', async (_event, url: string) => {
     await electron.shell.openExternal(url);

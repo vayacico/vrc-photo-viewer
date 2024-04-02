@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Setting from '../../component/setting/Setting';
 import { State } from '../../reducers';
 import { getActivity } from '../../reducers/activityData';
@@ -36,6 +37,8 @@ const SettingContainer: React.FC = () => {
     'NOT_YET' | 'LOADING' | 'SUCCESS' | 'ERROR'
   >('NOT_YET');
   const dispatch = useDispatch<AppDispatch>();
+
+  const { i18n } = useTranslation();
 
   const getDatabaseFilePath = async () => {
     const dbFilePath = await window.service.settings.getDbFileLocation();
@@ -110,11 +113,20 @@ const SettingContainer: React.FC = () => {
     }
   };
 
+  const setLanguage = async (lng: string) => {
+    if (lng === 'ja' || lng === 'en') {
+      await i18n.changeLanguage(lng);
+      await window.service.settings.updateLanguageSetting(lng);
+    }
+  };
+
   return (
     <Setting
       show={mode === 'SETTING'}
       databaseFilePath={databaseFilePath}
       photoDirectoryPaths={photoDirectoryPaths}
+      language={i18n.language}
+      setLanguage={setLanguage}
       showUpdateDatabaseFilePathDialog={showUpdateDatabaseFilePathDialog}
       showAddPhotoDirectoryDialog={showAddPhotoDirectoryDialog}
       deletePhotoDirectoryPath={deletePhotoDirectoryPath}
