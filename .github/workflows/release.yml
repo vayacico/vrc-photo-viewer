@@ -26,8 +26,8 @@ jobs:
         id: licence
         # package.jsonに定義されているライブラリからファイルを出力、ボイラープレートとアイコンのライセンスを手動で追加
         run: |
-          npx license-checker-rseidelsohn --plainVertical --direct | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8
-          npx license-checker-rseidelsohn --start .\release\app\ --plainVertical --direct --excludePackages "vrc-photo-viewer" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
+          npx license-checker-rseidelsohn --plainVertical --production --direct 0 | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8
+          npx license-checker-rseidelsohn --start .\release\app\ --plainVertical --production --direct 0 --excludePackages "vrc-photo-viewer" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
           echo "`n`nelectron-react-boilerplate/electron-react-boilerplate v4.6.0`n" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
           curl.exe https://raw.githubusercontent.com/electron-react-boilerplate/electron-react-boilerplate/f99a45d2a2daf6f7e6dd4f7bc9d453bf44a384d8/LICENSE | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
           echo "`n`nmicrosoft/fluentui-emoji`n" | Out-File -FilePath  .\assets\LICENCE.txt -Encoding utf8 -Append
