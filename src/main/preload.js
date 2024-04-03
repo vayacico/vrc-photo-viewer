@@ -62,6 +62,12 @@ contextBridge.exposeInMainWorld('service', {
     updateFileSetting(settingForm) {
       return ipcRenderer.invoke('UPDATE_FILE_SETTING', settingForm);
     },
+    getLanguageSetting() {
+      return ipcRenderer.invoke('GET_LANGUAGE');
+    },
+    updateLanguageSetting(language) {
+      return ipcRenderer.invoke('UPDATE_LANGUAGE', language);
+    },
   },
   application: {
     close() {

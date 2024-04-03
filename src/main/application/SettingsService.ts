@@ -6,7 +6,7 @@ import { SettingForm } from '../../dto/SettingForm';
 import ActivityLogRepository from '../domain/model/ActivityLogRepository';
 import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 
-export default class FileSettingsService {
+export default class SettingsService {
   settingRepository: SettingRepository;
 
   activityLogRepository: ActivityLogRepository;
@@ -89,5 +89,20 @@ export default class FileSettingsService {
     }
 
     return null;
+  }
+
+  /**
+   * 言語設定を取得。未設定の場合は英語が返る。
+   */
+  async getLanguageSetting(): Promise<'ja' | 'en'> {
+    return this.settingRepository.getLanguage();
+  }
+
+  /**
+   * 言語設定を更新
+   * @param lng
+   */
+  async updateLanguageSetting(lng: 'ja' | 'en'): Promise<void> {
+    return this.settingRepository.updateLanguage(lng);
   }
 }

@@ -1,7 +1,12 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
+import i18n from 'i18next';
+import Backend from 'i18next-node-fs-backend';
 import registerHandler from './interfaces/IpcHandler';
 import { resolveHtmlPath } from './util';
+import en from '../i18n/locales/en.json';
+import ja from '../i18n/locales/ja.json';
+import SettingsService from './application/SettingsService';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -51,6 +56,28 @@ const createWindow = async () => {
     }
   });
 };
+
+// i18nの初期化
+new SettingsService()
+  .getLanguageSetting()
+  // eslint-disable-next-line promise/always-return
+  .then((lng) => {
+    i18n.use(Backend).init({
+      resources: {
+        en: {
+          translation: en,
+        },
+        ja: {
+          translation: ja,
+        },
+      },
+      lng,
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+  })
+  .catch(console.log);
 
 // アプリケーションエントリポイント
 app

@@ -5,7 +5,11 @@ export default interface SettingRepository {
 
   getPhotoDirectoryLocations(): Promise<string[]>;
 
+  getLanguage(): Promise<'ja' | 'en'>;
+
   updateDbFileLocation(path: string): Promise<void>;
 
   updatePhotoDirectoryLocations(paths: string[]): Promise<void>;
+
+  updateLanguage(lng: 'ja' | 'en'): Promise<void>;
 }

@@ -1,0 +1,68 @@
+{
+  "error": {
+    "dbFileNotSet": "データベースファイルが設定されていません",
+    "directoryNotSet": "写真ファイルのディレクトリが設定されていません",
+    "unknown": "データベースファイルを開こうとした際に予期せぬエラーが発生しました"
+  },
+  "toast": {
+    "scanning": {
+      "description": "スキャン中"
+    },
+    "scanFinished": {
+      "description": "更新が完了しました"
+    },
+    "scanFinishedWithNewPhoto": {
+      "description": "新たに{NUMBER}枚の写真が見つかりました"
+    },
+    "scanFinishedWithNoPhoto": {
+      "heading": "写真が見つかりませんでした",
+      "description": "写真のフォルダ設定が正しいか確認してください"
+    },
+    "notConfigured": {
+      "heading": "未設定",
+      "description": "設定からデータベースファイルの指定を行ってください"
+    }
+  },
+  "setting": {
+    "tab": {
+      "file": "ファイル管理",
+      "setting": "一般設定",
+      "about": "このアプリについて"
+    },
+    "db": {
+      "heading": "データベース設定",
+      "description": "VRChatActivityToolsのデータベースファイルのパスを指定してください（例：VRChatActivityLog.db）"
+    },
+    "photoFolders": {
+      "heading": "写真フォルダ設定",
+      "description": "スキャン対象の写真が保存されているフォルダを指定してください"
+    },
+    "language": {
+      "heading": "表示言語",
+      "description": "アプリの表示言語を選択してください"
+    },
+    "settingFile": {
+      "heading": "設定ファイル編集",
+      "description": "アプリの設定ファイル（JSON形式）を開いて編集することができます",
+      "button": "設定ファイルを開く"
+    },
+    "thumbnailCache": {
+      "heading": "サムネイルキャッシュ管理",
+      "description": "サムネイルキャッシュを管理するためのフォルダにアクセスします。フォルダを削除すると、アプリは全ての画像に対してサムネイルを再生成します",
+      "button": "キャッシュフォルダー"
+    },
+    "version": {
+      "heading": "バージョン"
+    },
+    "license": {
+      "heading": "ライセンス情報",
+      "description": "このアプリは、以下のオープンソースソフトウェアを使用しています"
+    },
+    "apply": {
+      "button": "適用",
+      "loading": "適用中",
+      "successMessage": "データベースの読み取りと写真のスキャンが完了しました",
+      "errorMessage": "設定の保存中にエラーが発生しました"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
 import StatusBar from '../../component/common/StatusBar';
 import { State } from '../../reducers';
 import { AppDispatch } from '../../createStore';
@@ -33,6 +34,8 @@ const StatusBarContainer: React.FC = () => {
 
   const toast = useToast();
 
+  const { t } = useTranslation();
+
   /**
    * 写真のスキャンをトリガーして結果に応じてトーストを出す
    */
@@ -43,9 +46,10 @@ const StatusBarContainer: React.FC = () => {
       dispatch(getWorld());
       if (response.photoCount > response.oldPhotoCount) {
         toast({
-          description: `${`new ${
-            response.photoCount - response.oldPhotoCount
-          }`} photos found.`,
+          description: t('toast.scanFinishedWithNewPhoto.description').replace(
+            '{NUMBER}',
+            (response.photoCount - response.oldPhotoCount).toString()
+          ),
           position: 'bottom-right',
           status: 'success',
           isClosable: false,
@@ -55,7 +59,7 @@ const StatusBarContainer: React.FC = () => {
         });
       } else {
         toast({
-          description: `photo updated`,
+          description: t('toast.scanFinished.description'),
           position: 'bottom-right',
           status: 'success',
           isClosable: false,
@@ -66,8 +70,8 @@ const StatusBarContainer: React.FC = () => {
       }
       if (response.photoCount === 0) {
         toast({
-          title: 'No photo found.',
-          description: 'Check photo directory settings.',
+          title: t('toast.scanFinishedWithNoPhoto.heading'),
+          description: t('toast.scanFinishedWithNoPhoto.description'),
           position: 'bottom-right',
           status: 'warning',
           isClosable: false,
@@ -120,7 +124,7 @@ const StatusBarContainer: React.FC = () => {
       }
       setIsLoading(true);
       scanningToastRef.current = toast({
-        description: 'Scanning images',
+        description: t('toast.scanning.description'),
         position: 'bottom-right',
         status: 'loading',
         isClosable: false,
