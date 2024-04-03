@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { DataSource } from 'typeorm';
 import { UserSearchResult } from 'main/domain/model/dto/UserSearchResult';
+import { OPEN_READONLY } from 'sqlite3';
 import ActivityLogRepository from '../../domain/model/ActivityLogRepository';
 import { WorldSearchResult } from '../../domain/model/dto/WorldSeatchResult';
 import { UserLog } from '../../domain/model/dto/UserLog';
@@ -23,6 +24,7 @@ export default class ActivityLogRepositoryImpl
     const dataSource = new DataSource({
       type: 'sqlite',
       database: path,
+      flags: OPEN_READONLY,
     });
     await dataSource.initialize();
 
@@ -74,17 +76,18 @@ export default class ActivityLogRepositoryImpl
              leftDateTable.leftLogId        as leftLogId,
              leftDateTable.estimateLeftDate as estimateLeftDate
       FROM ActivityLogs log
-             LEFT OUTER JOIN (
-        SELECT a1.ID as     logId,
-               a1.Timestamp joinDate,
-               a2.ID        leftLogId,
-               a2.Timestamp estimateLeftDate
-        FROM ActivityLogs a1,
-             ActivityLogs a2
-        WHERE a1.ActivityType = 0
-          AND (a2.ID =
-               (SELECT min(a3.ID) FROM ActivityLogs a3 WHERE a3.ID > a1.ID AND a3.ActivityType = 0))
-      ) leftDateTable
+             LEFT OUTER JOIN (SELECT a1.ID as     logId,
+                                     a1.Timestamp joinDate,
+                                     a2.ID        leftLogId,
+                                     a2.Timestamp estimateLeftDate
+                              FROM ActivityLogs a1,
+                                   ActivityLogs a2
+                              WHERE a1.ActivityType = 0
+                                AND (a2.ID =
+                                     (SELECT min(a3.ID)
+                                      FROM ActivityLogs a3
+                                      WHERE a3.ID > a1.ID
+                                        AND a3.ActivityType = 0))) leftDateTable
                              ON log.ID = leftDateTable.logId
       WHERE log.ActivityType = 0
       ORDER BY log.ID DESC;`);
@@ -134,17 +137,18 @@ export default class ActivityLogRepositoryImpl
                leftDateTable.leftLogId        as leftLogId,
                leftDateTable.estimateLeftDate as estimateLeftDate
         FROM ActivityLogs log
-               LEFT OUTER JOIN (
-          SELECT a1.ID as     logId,
-                 a1.Timestamp joinDate,
-                 a2.ID        leftLogId,
-                 a2.Timestamp estimateLeftDate
-          FROM ActivityLogs a1,
-               ActivityLogs a2
-          WHERE a1.ActivityType = 0
-            AND (a2.ID =
-                 (SELECT min(a3.ID) FROM ActivityLogs a3 WHERE a3.ID > a1.ID AND a3.ActivityType = 0))
-        ) leftDateTable
+               LEFT OUTER JOIN (SELECT a1.ID as     logId,
+                                       a1.Timestamp joinDate,
+                                       a2.ID        leftLogId,
+                                       a2.Timestamp estimateLeftDate
+                                FROM ActivityLogs a1,
+                                     ActivityLogs a2
+                                WHERE a1.ActivityType = 0
+                                  AND (a2.ID =
+                                       (SELECT min(a3.ID)
+                                        FROM ActivityLogs a3
+                                        WHERE a3.ID > a1.ID
+                                          AND a3.ActivityType = 0))) leftDateTable
                                ON log.ID = leftDateTable.logId
         WHERE log.ActivityType = 0
           AND log.WorldName LIKE ?
@@ -206,19 +210,18 @@ export default class ActivityLogRepositoryImpl
                leftDateTable.estimateLeftDate as estimateLeftDate
         FROM ActivityLogs log1,
              ActivityLogs log2
-               LEFT OUTER JOIN (
-               SELECT a1.ID as     logId,
-                      a1.Timestamp joinDate,
-                      a2.ID        leftLogId,
-                      a2.Timestamp estimateLeftDate
-               FROM ActivityLogs a1,
-                    ActivityLogs a2
-               WHERE a1.ActivityType = 0
-                 AND (a2.ID =
-                      (SELECT min(a3.ID)
-                       FROM ActivityLogs a3
-                       WHERE a3.ID > a1.ID
-                         AND a3.ActivityType = 0))) leftDateTable
+               LEFT OUTER JOIN (SELECT a1.ID as     logId,
+                                       a1.Timestamp joinDate,
+                                       a2.ID        leftLogId,
+                                       a2.Timestamp estimateLeftDate
+                                FROM ActivityLogs a1,
+                                     ActivityLogs a2
+                                WHERE a1.ActivityType = 0
+                                  AND (a2.ID =
+                                       (SELECT min(a3.ID)
+                                        FROM ActivityLogs a3
+                                        WHERE a3.ID > a1.ID
+                                          AND a3.ActivityType = 0))) leftDateTable
                                ON log2.ID = leftDateTable.logId
         WHERE log1.UserName like ?
           AND log2.ID = (SELECT max(a3.ID) FROM ActivityLogs a3 WHERE a3.ID < log1.ID AND a3.ActivityType = 0)
