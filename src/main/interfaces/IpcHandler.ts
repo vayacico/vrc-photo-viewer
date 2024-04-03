@@ -78,7 +78,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: i18next.t('error.unknown'),
+        message: `${e}`,
       } as ErrorResponse;
     }
   });
@@ -103,7 +103,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: i18next.t('error.unknown'),
+        message: `${e}`,
       } as ErrorResponse;
     }
   });
@@ -123,7 +123,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: i18next.t('error.unknown'),
+        message: `${e}`,
       } as ErrorResponse;
     }
   });
@@ -168,7 +168,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       return {
         status: 'failed',
         errorCode: 'UNKNOWN',
-        message: i18next.t('error.unknown'),
+        message: `${e}`,
       } as ErrorResponse;
     }
   });
@@ -202,7 +202,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: i18next.t('error.unknown'),
+          message: `${e}`,
         } as ErrorResponse;
       }
     }
@@ -237,7 +237,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: i18next.t('error.unknown'),
+          message: `${e}`,
         } as ErrorResponse;
       }
     }
@@ -270,7 +270,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: i18next.t('error.unknown'),
+          message: `${e}`,
         } as ErrorResponse;
       }
     }
@@ -303,7 +303,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
         return {
           status: 'failed',
           errorCode: 'UNKNOWN',
-          message: i18next.t('error.unknown'),
+          message: `${e}`,
         } as ErrorResponse;
       }
     }
