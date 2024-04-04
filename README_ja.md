@@ -1,4 +1,4 @@
-# VRCフォトビューワー
+# VRC Photo Viewer
 
 ![Workflow Status](https://github.com/vayacico/vrc-photo-viewer/actions/workflows/commit.yml/badge.svg)
 ![Known Vulnerabilities](https://snyk.io/test/github/vayacico/vrc-photo-viewer/badge.svg)
