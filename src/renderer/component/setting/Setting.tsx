@@ -28,6 +28,7 @@ interface Props {
   showAddPhotoDirectoryDialog: () => Promise<void>;
   deletePhotoDirectoryPath: (path: string) => Promise<void>;
   apply: () => Promise<void>;
+  setStatus: (text: string) => void;
 }
 
 const Wrapper = styled.div<{ show: boolean }>`
@@ -180,6 +181,31 @@ const Setting: React.FC<Props> = (props) => {
     );
   });
 
+  // Description中にVRChatActivityToolsが含まれている場合はリンクを設定
+  const databaseDescription =
+    t('setting.db.description').includes('VRChatActivityTools') &&
+    t('setting.db.description').split('VRChatActivityTools').length === 2 ? (
+      <Description>
+        {t('setting.db.description').split('VRChatActivityTools')[0]}
+        <LinkText
+          onClick={() =>
+            window.service.application.openUrlInBrowser(
+              'https://booth.pm/ja/items/1690568'
+            )
+          }
+          onMouseEnter={() =>
+            props.setStatus('https://booth.pm/ja/items/1690568')
+          }
+          onMouseLeave={() => props.setStatus('')}
+        >
+          VRChatActivityTools
+        </LinkText>
+        {t('setting.db.description').split('VRChatActivityTools')[1]}
+      </Description>
+    ) : (
+      <Description>{t('setting.db.description')}</Description>
+    );
+
   return (
     <Wrapper show={props.show}>
       <Tabs marginRight="10px">
@@ -192,8 +218,7 @@ const Setting: React.FC<Props> = (props) => {
           <TabPanel>
             <Area>
               <Heading>{t('setting.db.heading')}</Heading>
-              <Description>{t('setting.db.description')}</Description>
-
+              {databaseDescription}
               <PathArea>
                 <Path>{props.databaseFilePath ?? ''}</Path>
                 <EditIcon
@@ -302,6 +327,12 @@ const Setting: React.FC<Props> = (props) => {
                       'https://github.com/vayacico/vrc-photo-viewer'
                     )
                   }
+                  onMouseEnter={() =>
+                    props.setStatus(
+                      'https://github.com/vayacico/vrc-photo-viewer'
+                    )
+                  }
+                  onMouseLeave={() => props.setStatus('')}
                 >
                   https://github.com/vayacico/vrc-photo-viewer
                 </LinkText>

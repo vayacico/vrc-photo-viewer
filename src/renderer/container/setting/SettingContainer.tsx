@@ -6,6 +6,7 @@ import { State } from '../../reducers';
 import { getActivity } from '../../reducers/activityData';
 import { getWorld } from '../../reducers/worldData';
 import { AppDispatch } from '../../createStore';
+import { statusActions } from '../../reducers/status';
 
 const SettingContainer: React.FC = () => {
   const mode = useSelector((state: State) => state.pageMode.current.mode);
@@ -40,6 +41,9 @@ const SettingContainer: React.FC = () => {
 
   const { i18n } = useTranslation();
 
+  const setStatus = (text: string) => {
+    dispatch(statusActions.setStatus({ text }));
+  };
   const getDatabaseFilePath = async () => {
     const dbFilePath = await window.service.settings.getDbFileLocation();
     setDatabaseFilePath(dbFilePath);
@@ -134,6 +138,7 @@ const SettingContainer: React.FC = () => {
       errorMessage={errorMessage}
       applyStatus={applyStatus}
       version={version}
+      setStatus={setStatus}
     />
   );
 };
