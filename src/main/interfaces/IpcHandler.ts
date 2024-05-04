@@ -335,6 +335,13 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data: await statisticsService.getWorldJoinedCount(from, to),
         } as WorldJoinCountResponse;
       } catch (e) {
+        if (e instanceof DatabaseFilePathNotSetException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_NOT_SET',
+            message: i18next.t('error.dbFileNotSet'),
+          } as ErrorResponse;
+        }
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -360,6 +367,13 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data: await statisticsService.getUserJoinedCount(from, to),
         } as UserJoinCountResponse;
       } catch (e) {
+        if (e instanceof DatabaseFilePathNotSetException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_NOT_SET',
+            message: i18next.t('error.dbFileNotSet'),
+          } as ErrorResponse;
+        }
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -386,6 +400,13 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           count: photoCount,
         } as PhotoCountResponse;
       } catch (e) {
+        if (e instanceof DatabaseFilePathNotSetException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_NOT_SET',
+            message: i18next.t('error.dbFileNotSet'),
+          } as ErrorResponse;
+        }
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -412,6 +433,13 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data: heatMap,
         } as ActivityStaticsDataResponse;
       } catch (e) {
+        if (e instanceof DatabaseFilePathNotSetException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_NOT_SET',
+            message: i18next.t('error.dbFileNotSet'),
+          } as ErrorResponse;
+        }
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -438,6 +466,13 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data,
         } as WorldTypeJoinStatisticsDataResponse;
       } catch (e) {
+        if (e instanceof DatabaseFilePathNotSetException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_NOT_SET',
+            message: i18next.t('error.dbFileNotSet'),
+          } as ErrorResponse;
+        }
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
