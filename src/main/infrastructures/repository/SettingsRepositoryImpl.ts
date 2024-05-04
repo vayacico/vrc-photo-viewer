@@ -30,7 +30,7 @@ export default class SettingsRepositoryImpl implements SettingRepository {
       if (result === 'ja' || result === 'en') {
         return result;
       }
-      return 'en';
+      return 'ja';
     } catch (e) {
       return 'en';
     }
