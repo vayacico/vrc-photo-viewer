@@ -12,6 +12,7 @@ import InternalDatabaseRepository from '../domain/model/InternalDatabaseReposito
 import InternalDatabaseRepositoryImpl from '../infrastructures/repository/InternalDatabaseRepositoryImpl';
 import PhotoEntity from '../infrastructures/entity/photoEntity';
 import { ScanResult } from '../domain/model/dto/scanResult';
+import { InstanceType } from '../../dto/ActivityStatisticsData';
 
 export default class ActivityService {
   activityLogRepository: ActivityLogRepository;
@@ -129,10 +130,14 @@ export default class ActivityService {
       throw new DatabaseFilePathNotSetException();
     }
 
+    // クエリをパース
+    const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
+
     // キーワードをもとにJoinログを取得
     const joinLog = await this.activityLogRepository.getJoinLogByUserName(
       databasePath,
-      keyword
+      queryKeyword,
+      { instanceType: filter.instanceType }
     );
 
     // Joinログの範囲に撮影された写真を検索（UIが固まるのでPromise.allを使わない）
@@ -145,16 +150,27 @@ export default class ActivityService {
       );
 
       result.push(
-        ...tmp.map((item) => {
-          return {
-            createdDate: item.createdDate,
-            originalFilePath: item.originalFilePath,
-            instanceId: joinLog[i]?.instanceId,
-            joinDate: joinLog[i]?.worldJoinDate,
-            estimateLeftDate: joinLog[i]?.estimateLeftDate,
-            worldName: joinLog[i]?.worldName,
-          } as PhotoLog;
-        })
+        ...tmp
+          .filter((item) => {
+            return this.filterDate(
+              item.createdDate,
+              filter.fromDate,
+              filter.toDate,
+              filter.fromTime,
+              filter.toTime,
+              filter.dayOfWeek
+            );
+          })
+          .map((item) => {
+            return {
+              createdDate: item.createdDate,
+              originalFilePath: item.originalFilePath,
+              instanceId: joinLog[i]?.instanceId,
+              joinDate: joinLog[i]?.worldJoinDate,
+              estimateLeftDate: joinLog[i]?.estimateLeftDate,
+              worldName: joinLog[i]?.worldName,
+            } as PhotoLog;
+          })
       );
     }
 
@@ -177,10 +193,14 @@ export default class ActivityService {
       throw new PhotoDirectoryNotSetException();
     }
 
+    // クエリをパース
+    const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
+
     // キーワードを元にJoinログを検索
     const joinLog = await this.activityLogRepository.getJoinLogByWorldName(
       databasePath,
-      keyword
+      queryKeyword,
+      { instanceType: filter.instanceType }
     );
 
     // Joinログの範囲に撮影された写真を検索（UIが固まるのでPromise.allを使わない）
@@ -192,16 +212,27 @@ export default class ActivityService {
       );
 
       result.push(
-        ...photos.map((item) => {
-          return {
-            createdDate: item.createdDate,
-            originalFilePath: item.originalFilePath,
-            instanceId: joinLog[i]?.instanceId,
-            joinDate: joinLog[i]?.joinDate,
-            estimateLeftDate: joinLog[i]?.estimateLeftDate,
-            worldName: joinLog[i]?.worldName,
-          } as PhotoLog;
-        })
+        ...photos
+          .filter((item) => {
+            return this.filterDate(
+              item.createdDate,
+              filter.fromDate,
+              filter.toDate,
+              filter.fromTime,
+              filter.toTime,
+              filter.dayOfWeek
+            );
+          })
+          .map((item) => {
+            return {
+              createdDate: item.createdDate,
+              originalFilePath: item.originalFilePath,
+              instanceId: joinLog[i]?.instanceId,
+              joinDate: joinLog[i]?.joinDate,
+              estimateLeftDate: joinLog[i]?.estimateLeftDate,
+              worldName: joinLog[i]?.worldName,
+            } as PhotoLog;
+          })
       );
     }
 
@@ -218,10 +249,14 @@ export default class ActivityService {
       throw new DatabaseFilePathNotSetException();
     }
 
+    // クエリをパース
+    const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
+
     // キーワードを元にJoinログを検索
     const joinLog = await this.activityLogRepository.getJoinLogByUserName(
       databasePath,
-      keyword
+      queryKeyword,
+      filter
     );
 
     // 該当時間帯に写真があるワールドにフィルターして返す
@@ -254,10 +289,14 @@ export default class ActivityService {
       throw new DatabaseFilePathNotSetException();
     }
 
+    // クエリをパース
+    const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
+
     // キーワードを元にJoinログを検索
     const joinLog = await this.activityLogRepository.getJoinLogByWorldName(
       databasePath,
-      keyword
+      queryKeyword,
+      filter
     );
 
     // 該当時間帯に写真があるワールドにフィルターして返す
@@ -357,5 +396,182 @@ export default class ActivityService {
       oldPhotoCount,
       photoCount: oldPhotoCount + addPhoto.length,
     };
+  }
+
+  /**
+   * 入力からクエリをパースする
+   * @param query
+   * @private
+   */
+  private parseQuery(query: string): {
+    keywords: string[];
+    filter: {
+      fromDate?: Date;
+      toDate?: Date;
+      fromTime?: Date;
+      toTime?: Date;
+      dayOfWeek?: number;
+      instanceType?: InstanceType;
+    };
+  } {
+    const segments = query.split(/\s+/);
+    const filter: {
+      fromDate?: Date;
+      toDate?: Date;
+      fromTime?: Date;
+      toTime?: Date;
+      dayOfWeek?: number;
+      instanceType?: InstanceType;
+    } = {};
+    const keywords: string[] = [];
+
+    segments.forEach((segment) => {
+      if (segment.startsWith('since:')) {
+        const dateStr = segment.replace('since:', '');
+        if (this.isValidDate(dateStr)) {
+          const date = new Date(dateStr);
+          date.setHours(0, 0, 0, 0);
+          filter.fromDate = date;
+        }
+      } else if (segment.startsWith('until:')) {
+        const dateStr = segment.replace('until:', '');
+        if (this.isValidDate(dateStr)) {
+          const date = new Date(dateStr);
+          date.setHours(23, 59, 59, 999);
+          filter.toDate = date;
+        }
+      } else if (segment.startsWith('sinceTime:')) {
+        const timeStr = segment.replace('sinceTime:', '');
+        if (this.isValidTime(timeStr)) {
+          filter.fromTime = new Date(`1970-01-01T${timeStr}:00`);
+        }
+      } else if (segment.startsWith('untilTime:')) {
+        const timeStr = segment.replace('untilTime:', '');
+        if (this.isValidTime(timeStr)) {
+          filter.toTime = new Date(`1970-01-01T${timeStr}:00`);
+        }
+      } else if (segment.startsWith('dayOfWeek:')) {
+        const dayOfWeek = this.getWeekNumber(segment.replace('dayOfWeek:', ''));
+        if (dayOfWeek !== null) {
+          filter.dayOfWeek = dayOfWeek;
+        }
+      } else if (segment.startsWith('instanceType:')) {
+        const type = this.getInstanceType(segment.replace('instanceType:', ''));
+        if (type) {
+          filter.instanceType = type;
+        }
+      } else {
+        keywords.push(segment);
+      }
+    });
+
+    return {
+      keywords,
+      filter,
+    };
+  }
+
+  private isValidDate(dateStr: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+  }
+
+  private isValidTime(timeStr: string): boolean {
+    return /^\d{2}:\d{2}$/.test(timeStr);
+  }
+
+  private getInstanceType(type: string): InstanceType | null {
+    switch (type) {
+      case 'public':
+        return 'PUBLIC';
+      case 'friend_plus':
+        return 'FRIEND_PLUS';
+      case 'friend':
+        return 'FRIEND';
+      case 'invite_plus':
+        return 'INVITE_PLUS';
+      case 'invite':
+        return 'INVITE';
+      case 'group':
+        return 'GROUP';
+      case 'group_plus':
+        return 'GROUP_PLUS';
+      case 'group_public':
+        return 'GROUP_PUBLIC';
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * ターゲットの日付がフィルター条件に当てはまるかを返す
+   *
+   * @param targetDate
+   * @param fromDate
+   * @param toDate
+   * @param fromTime
+   * @param toTime
+   * @param dayOfWeek
+   * @private
+   */
+  private filterDate(
+    targetDate: Date,
+    fromDate?: Date,
+    toDate?: Date,
+    fromTime?: Date,
+    toTime?: Date,
+    dayOfWeek?: number
+  ): boolean {
+    if (fromDate && targetDate < fromDate) {
+      return false;
+    }
+    if (toDate && targetDate > toDate) {
+      return false;
+    }
+    if (fromTime && targetDate.getHours() < fromTime.getHours()) {
+      return false;
+    }
+    if (
+      fromTime &&
+      targetDate.getHours() === fromTime.getHours() &&
+      targetDate.getMinutes() < fromTime.getMinutes()
+    ) {
+      return false;
+    }
+    if (toTime && targetDate.getHours() > toTime.getHours()) {
+      return false;
+    }
+    if (
+      toTime &&
+      targetDate.getHours() === toTime.getHours() &&
+      targetDate.getMinutes() >= toTime.getMinutes()
+    ) {
+      return false;
+    }
+    if (dayOfWeek !== undefined && targetDate.getDay() !== dayOfWeek) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private getWeekNumber(weekDay: string): number | null {
+    switch (weekDay) {
+      case 'sunday':
+        return 0;
+      case 'monday':
+        return 1;
+      case 'tuesday':
+        return 2;
+      case 'wednesday':
+        return 3;
+      case 'thursday':
+        return 4;
+      case 'friday':
+        return 5;
+      case 'saturday':
+        return 6;
+      default:
+        return null;
+    }
   }
 }

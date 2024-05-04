@@ -67,6 +67,18 @@ export default class InternalDatabaseRepositoryImpl
     });
   }
 
+  async getPhotoTimestamps(from: Date, to: Date): Promise<Date[]> {
+    await this.init();
+    const result = await this.dataSource.getRepository(PhotoEntity).find({
+      select: ['createDate'],
+      where: {
+        createDate: Between(from, to),
+      },
+    });
+
+    return result.map((item) => item.createDate);
+  }
+
   async getPhotoCount(): Promise<number> {
     await this.init();
 

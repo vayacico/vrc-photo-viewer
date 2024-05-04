@@ -24,6 +24,31 @@ export interface WorldData {
   estimateLeftDate: Date;
 }
 
+export interface PhotoCountResponse {
+  status: 'success';
+  count: number;
+}
+
+export interface WorldJoinCountResponse {
+  status: 'success';
+  data: WorldJoinCount[];
+}
+
+export interface WorldJoinCount {
+  worldName: string;
+  count: number;
+}
+
+export interface UserJoinCountResponse {
+  status: 'success';
+  data: UserJoinCount[];
+}
+
+export interface UserJoinCount {
+  userName: string;
+  count: number;
+}
+
 export interface ErrorResponse {
   status: 'failed';
   errorCode: 'FILE_INVALID' | 'FILE_NOT_SET' | 'DIRECTORY_NOT_SET' | 'UNKNOWN';

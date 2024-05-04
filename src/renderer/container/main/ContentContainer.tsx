@@ -13,6 +13,8 @@ import { getActivity, imageGalleryActions } from '../../reducers/activityData';
 import { getWorld, worldDataActions } from '../../reducers/worldData';
 import { AppDispatch } from '../../createStore';
 import { pageModeActions } from '../../reducers/pageMode';
+import { getSummaryData } from '../../reducers/summaryData';
+import SummaryContainer from '../summary/SummaryContainer';
 
 const ContentContainer: React.FC = () => {
   const pageMode = useSelector((state: State) => state.pageMode.current);
@@ -27,6 +29,12 @@ const ContentContainer: React.FC = () => {
   );
   const getWorldErrorMessage = useSelector(
     (state: State) => state.worldData.errorMessage
+  );
+  const isGetSummaryError = useSelector(
+    (state: State) => state.summary.isError
+  );
+  const getSummaryErrorMessage = useSelector(
+    (state: State) => state.summary.errorMessage
   );
   const dispatch = useDispatch<AppDispatch>();
 
@@ -77,6 +85,27 @@ const ContentContainer: React.FC = () => {
     }
   }, [isGetWorldError, getWorldErrorMessage]);
 
+  // エラー状態が変化したらトーストを表示（サマリ取得）
+  useEffect(() => {
+    if (isGetSummaryError) {
+      if (scanningToastRef.current) {
+        toast.close(scanningToastRef.current);
+      }
+      if (!errorToastRef.current) {
+        errorToastRef.current = toast({
+          title: 'ERROR',
+          description: getSummaryErrorMessage,
+          position: 'bottom-right',
+          status: 'error',
+          isClosable: false,
+          containerStyle: {
+            marginBottom: 4,
+          },
+        });
+      }
+    }
+  }, [isGetSummaryError, getSummaryErrorMessage]);
+
   /**
    * 写真のスキャンをトリガーして結果に応じてトーストを出す
    */
@@ -85,6 +114,7 @@ const ContentContainer: React.FC = () => {
     if (response.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
+      dispatch(getSummaryData(new Date()));
       await getWorld();
       if (scanningToastRef.current) {
         toast.close(scanningToastRef.current);
@@ -195,6 +225,7 @@ const ContentContainer: React.FC = () => {
       <PhotoGalleryContainer />
       <WorldGalleryContainer />
       <SearchContainer />
+      {pageMode.mode === 'SUMMARY' ? <SummaryContainer /> : null}
       {pageMode.mode === 'PHOTO_DETAIL_FOR_GALLERY' ||
       pageMode.mode === 'PHOTO_DETAIL_FOR_SEARCH' ? (
         <PhotoDetailContainer />

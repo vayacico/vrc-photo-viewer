@@ -11,12 +11,14 @@ export type Mode =
   | 'PHOTO_DETAIL_FOR_GALLERY'
   | 'PHOTO_DETAIL_FOR_SEARCH'
   | 'SEARCH'
+  | 'SUMMARY'
   | 'SETTING';
 
 export type PageMode = {
   mode: Mode;
   errorMessage?: string;
   scrollInstanceId?: string | null;
+  searchWord?: string | null;
 };
 
 const initialState: PageModeState = {
@@ -42,7 +44,11 @@ const slice = createSlice({
         state.history.push({ ...state.current, scrollInstanceId: null });
       }
       if (action.payload.mode !== 'GALLERY') {
-        state.current = { ...action.payload, scrollInstanceId: null };
+        state.current = {
+          ...action.payload,
+          scrollInstanceId: null,
+          searchWord: action.payload.searchWord,
+        };
       } else {
         state.current = action.payload;
       }
@@ -50,6 +56,10 @@ const slice = createSlice({
     },
     clearInstanceId: (state) => {
       state.current.scrollInstanceId = null;
+      return state;
+    },
+    clearSearchKeyword: (state) => {
+      state.current.searchWord = null;
       return state;
     },
     reset: (state) => {
