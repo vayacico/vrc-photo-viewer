@@ -39,6 +39,9 @@ const Wrapper = styled.div`
 
 const SearchContainer: React.FC = () => {
   const type = useSelector((state: State) => state.searchResult.type);
+  const defaultSearchKeyword = useSelector(
+    (state: State) => state.pageMode.current.searchWord
+  );
   const isLoading = useSelector((state: State) => state.searchResult.isLoading);
   const photo = useSelector((state: State) => state.searchResult.photo);
   const world = useSelector((state: State) => state.searchResult.world);
@@ -141,6 +144,16 @@ const SearchContainer: React.FC = () => {
   useEffect(() => {
     handleResize();
   }, [mode]);
+
+  // 他モードからクエリが指定されていたら表示時に検索する
+  useEffect(() => {
+    if (defaultSearchKeyword) {
+      setViewMode('PHOTO');
+      setSearchKeyword(defaultSearchKeyword);
+      search(defaultSearchKeyword);
+      dispatch(pageModeActions.clearSearchKeyword());
+    }
+  }, [defaultSearchKeyword]);
 
   /**
    * ウインドウ横幅変更時の処理

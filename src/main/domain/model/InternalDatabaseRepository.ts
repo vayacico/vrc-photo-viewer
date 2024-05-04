@@ -6,6 +6,8 @@ export default interface InternalDatabaseRepository {
 
   getPhoto(from: Date, to: Date): Promise<Photo[]>;
 
+  getPhotoTimestamps(from: Date, to: Date): Promise<Date[]>;
+
   getPhotoCount(): Promise<number>;
 
   insertPhotos(entities: PhotoEntity[]): Promise<void>;

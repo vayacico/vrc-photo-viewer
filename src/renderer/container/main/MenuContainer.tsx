@@ -26,12 +26,17 @@ const MenuContainer: React.FC = () => {
     dispatch(pageModeActions.replace({ mode: 'SETTING' }));
   };
 
+  const onClickSummaryButton = () => {
+    dispatch(pageModeActions.replace({ mode: 'SUMMARY' }));
+  };
+
   return (
     <Menu
       onClickGalleryButton={onClickGalleryButton}
       onClickWorldButton={onClickWorldButton}
       onClickSettingButton={onClickSettingButton}
       onClickSearchButton={onClickSearchButton}
+      onClickSummaryButton={onClickSummaryButton}
       pageMode={mode}
     />
   );

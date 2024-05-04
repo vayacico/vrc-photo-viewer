@@ -5,8 +5,11 @@ import fs from 'fs/promises';
 import i18next from 'i18next';
 import {
   ErrorResponse,
+  PhotoCountResponse,
   PhotoResponse,
+  UserJoinCountResponse,
   WorldData,
+  WorldJoinCountResponse,
   WorldResponse,
 } from '../../dto/ActivityLog';
 import ActivityService from '../application/ActivityService';
@@ -17,6 +20,11 @@ import { ApplyResponse, SettingForm } from '../../dto/SettingForm';
 import DatabaseFilePathNotSetException from '../domain/model/exception/DatabaseFilePathNotSetException';
 import PhotoDirectoryNotSetException from '../domain/model/exception/PhotoDirectoryNotSetException';
 import { ScanResultResponse } from '../../dto/ScanResult';
+import StatisticsService from '../application/StatisticsService';
+import {
+  ActivityStaticsDataResponse,
+  WorldTypeJoinStatisticsDataResponse,
+} from '../../dto/ActivityStatisticsData';
 import BrowserWindow = Electron.BrowserWindow;
 
 /**
@@ -25,6 +33,7 @@ import BrowserWindow = Electron.BrowserWindow;
  */
 const registerHandler = (browserWindow: BrowserWindow | null) => {
   const activityService = new ActivityService();
+  const statisticsService = new StatisticsService();
   const thumbnailService = new ThumbnailService();
   const settingService = new SettingsService();
 
@@ -316,6 +325,134 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
   ipcMain.handle('GET_WORLD_SUGGESTION', (_event, keyword: string) => {
     return activityService.getWorldSuggestion(keyword);
   });
+  // ワールドごとの訪問数を取得
+  ipcMain.handle(
+    'GET_STATISTICS_WORLD_JOIN_COUNT',
+    async (_event, from: Date, to: Date) => {
+      try {
+        return {
+          status: 'success',
+          data: await statisticsService.getWorldJoinedCount(from, to),
+        } as WorldJoinCountResponse;
+      } catch (e) {
+        if (e instanceof DatabaseErrorException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_INVALID',
+            message: e.message,
+          } as ErrorResponse;
+        }
+        return {
+          status: 'failed',
+          errorCode: 'UNKNOWN',
+          message: `${e}`,
+        } as ErrorResponse;
+      }
+    }
+  );
+  // ユーザーごとのJoin回数を取得
+  ipcMain.handle(
+    'GET_STATISTICS_USER_JOIN_COUNT',
+    async (_event, from: Date, to: Date) => {
+      try {
+        return {
+          status: 'success',
+          data: await statisticsService.getUserJoinedCount(from, to),
+        } as UserJoinCountResponse;
+      } catch (e) {
+        if (e instanceof DatabaseErrorException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_INVALID',
+            message: e.message,
+          } as ErrorResponse;
+        }
+        return {
+          status: 'failed',
+          errorCode: 'UNKNOWN',
+          message: `${e}`,
+        } as ErrorResponse;
+      }
+    }
+  );
+  // 写真の撮影枚数を取得
+  ipcMain.handle(
+    'GET_STATISTICS_PHOTO_COUNT',
+    async (_event, from: Date, to: Date) => {
+      try {
+        const photoCount = await statisticsService.getPhotoTakenCount(from, to);
+        return {
+          status: 'success',
+          count: photoCount,
+        } as PhotoCountResponse;
+      } catch (e) {
+        if (e instanceof DatabaseErrorException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_INVALID',
+            message: e.message,
+          } as ErrorResponse;
+        }
+        return {
+          status: 'failed',
+          errorCode: 'UNKNOWN',
+          message: `${e}`,
+        } as ErrorResponse;
+      }
+    }
+  );
+  // アクティビティのヒートマップを取得
+  ipcMain.handle(
+    'GET_STATISTICS_ACTIVITY_HEAT_MAP',
+    async (_event, from: Date, to: Date) => {
+      try {
+        const heatMap = await statisticsService.getActivityCountMap(from, to);
+        return {
+          status: 'success',
+          data: heatMap,
+        } as ActivityStaticsDataResponse;
+      } catch (e) {
+        if (e instanceof DatabaseErrorException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_INVALID',
+            message: e.message,
+          } as ErrorResponse;
+        }
+        return {
+          status: 'failed',
+          errorCode: 'UNKNOWN',
+          message: `${e}`,
+        } as ErrorResponse;
+      }
+    }
+  );
+  // インスタンスタイプごとの訪問数を取得
+  ipcMain.handle(
+    'GET_STATISTICS_INSTANCE_TYPE_COUNT',
+    async (_event, from: Date, to: Date) => {
+      try {
+        const data = await statisticsService.getInstancesTypeCount(from, to);
+        return {
+          status: 'success',
+          data,
+        } as WorldTypeJoinStatisticsDataResponse;
+      } catch (e) {
+        if (e instanceof DatabaseErrorException) {
+          return {
+            status: 'failed',
+            errorCode: 'FILE_INVALID',
+            message: e.message,
+          } as ErrorResponse;
+        }
+        return {
+          status: 'failed',
+          errorCode: 'UNKNOWN',
+          message: `${e}`,
+        } as ErrorResponse;
+      }
+    }
+  );
   // サムネイルディレクトリオープン
   ipcMain.handle('OPEN_THUMBNAIL_DIRECTORY', async (_event) => {
     return thumbnailService.openThumbnailDirectory();

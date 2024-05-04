@@ -35,6 +35,23 @@ contextBridge.exposeInMainWorld('service', {
       return ipcRenderer.invoke('GET_WORLD_SUGGESTION', keyword);
     },
   },
+  statistics: {
+    getWorldJoinCount(from, to) {
+      return ipcRenderer.invoke('GET_STATISTICS_WORLD_JOIN_COUNT', from, to);
+    },
+    getUserJoinCount(from, to) {
+      return ipcRenderer.invoke('GET_STATISTICS_USER_JOIN_COUNT', from, to);
+    },
+    getPhotoCount(from, to) {
+      return ipcRenderer.invoke('GET_STATISTICS_PHOTO_COUNT', from, to);
+    },
+    getActivityHeatmap(from, to) {
+      return ipcRenderer.invoke('GET_STATISTICS_ACTIVITY_HEAT_MAP', from, to);
+    },
+    getInstanceTypeCount(from, to) {
+      return ipcRenderer.invoke('GET_STATISTICS_INSTANCE_TYPE_COUNT', from, to);
+    },
+  },
   thumbnail: {
     openThumbnailDirectory() {
       return ipcRenderer.invoke('OPEN_THUMBNAIL_DIRECTORY');

@@ -13,6 +13,8 @@ import { getActivity, imageGalleryActions } from '../../reducers/activityData';
 import { getWorld, worldDataActions } from '../../reducers/worldData';
 import { AppDispatch } from '../../createStore';
 import { pageModeActions } from '../../reducers/pageMode';
+import { getSummaryData } from '../../reducers/summaryData';
+import SummaryContainer from '../SummaryContainer';
 
 const ContentContainer: React.FC = () => {
   const pageMode = useSelector((state: State) => state.pageMode.current);
@@ -85,6 +87,7 @@ const ContentContainer: React.FC = () => {
     if (response.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
+      dispatch(getSummaryData(new Date()));
       await getWorld();
       if (scanningToastRef.current) {
         toast.close(scanningToastRef.current);
@@ -195,6 +198,7 @@ const ContentContainer: React.FC = () => {
       <PhotoGalleryContainer />
       <WorldGalleryContainer />
       <SearchContainer />
+      {pageMode.mode === 'SUMMARY' ? <SummaryContainer /> : null}
       {pageMode.mode === 'PHOTO_DETAIL_FOR_GALLERY' ||
       pageMode.mode === 'PHOTO_DETAIL_FOR_SEARCH' ? (
         <PhotoDetailContainer />

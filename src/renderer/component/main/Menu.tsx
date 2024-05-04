@@ -1,5 +1,11 @@
 import styled, { css } from 'styled-components';
-import { BsCardImage, BsGearFill, BsGlobe, BsSearch } from 'react-icons/bs';
+import {
+  BsCardImage,
+  BsClipboardData,
+  BsGearFill,
+  BsGlobe,
+  BsSearch,
+} from 'react-icons/bs';
 import React from 'react';
 import { Mode } from '../../reducers/pageMode';
 
@@ -8,6 +14,7 @@ interface Props {
   onClickSettingButton: (e: React.MouseEvent) => void;
   onClickWorldButton: (e: React.MouseEvent) => void;
   onClickSearchButton: (e: React.MouseEvent) => void;
+  onClickSummaryButton: (e: React.MouseEvent) => void;
   pageMode: Mode;
 }
 
@@ -64,6 +71,18 @@ const SearchButton = styled(BsSearch)<{ selected: boolean }>`
         `}
 `;
 
+const SummaryButton = styled(BsClipboardData)<{ selected: boolean }>`
+  font-size: 2em;
+  ${(props) =>
+    props.selected
+      ? css`
+          color: #252424;
+        `
+      : css`
+          color: #8e8e8e;
+        `}
+`;
+
 const SettingButton = styled(BsGearFill)<{ selected: boolean }>`
   font-size: 2em;
   ${(props) =>
@@ -92,6 +111,9 @@ const Menu: React.FC<Props> = (props) => {
       </Button>
       <Button onClick={props.onClickSearchButton}>
         <SearchButton selected={props.pageMode === 'SEARCH'} />
+      </Button>
+      <Button onClick={props.onClickSummaryButton}>
+        <SummaryButton selected={props.pageMode === 'SUMMARY'} />
       </Button>
       <Button onClick={props.onClickSettingButton}>
         <SettingButton selected={props.pageMode === 'SETTING'} />
