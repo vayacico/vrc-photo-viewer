@@ -191,14 +191,14 @@ const instanceTypeConfig: {
   text: string;
   color: string;
 }[] = [
-  { type: 'PUBLIC', text: 'Public', color: '#EF9A9A' },
-  { type: 'FRIEND_PLUS', text: 'Friend+', color: '#90CAF9' },
-  { type: 'FRIEND', text: 'Friend', color: '#A5D6A7' },
-  { type: 'INVITE_PLUS', text: 'Invite+', color: '#FFF59D' },
-  { type: 'INVITE', text: 'Invite', color: '#CE93D8' },
-  { type: 'GROUP', text: 'Group', color: '#FFCC80' },
-  { type: 'GROUP_PLUS', text: 'Group+', color: '#B0BEC5' },
-  { type: 'GROUP_PUBLIC', text: 'Group public', color: '#F48FB1' },
+  { type: 'PUBLIC', text: 'Public', color: '#E57373' },
+  { type: 'FRIEND_PLUS', text: 'Friend+', color: '#64B5F6' },
+  { type: 'FRIEND', text: 'Friend', color: '#81C784' },
+  { type: 'INVITE_PLUS', text: 'Invite+', color: '#FFF176' },
+  { type: 'INVITE', text: 'Invite', color: '#BA68C8' },
+  { type: 'GROUP', text: 'Group', color: '#FFB74D' },
+  { type: 'GROUP_PLUS', text: 'Group+', color: '#90A4AE' },
+  { type: 'GROUP_PUBLIC', text: 'Group public', color: '#F06292' },
 ];
 
 const HeatmapDateConfig: { weekDay: WeekDay; text: string }[] = [
@@ -421,14 +421,14 @@ const Summary: React.FC<Props> = (props) => {
       <StatisticWrapper>
         <NumberStatisticWrapper>
           <WorldVisitCountCard>
-            <CardTitle>Worlds Visited</CardTitle>
+            <CardTitle>Visited Worlds</CardTitle>
             <WorldNumberWithIconWrapper>
               <Icon as={BsGlobe} boxSize={8} />
               <CardNumber>{props.joinCount ?? '-'}</CardNumber>
             </WorldNumberWithIconWrapper>
           </WorldVisitCountCard>
           <UserEncounteredCountCard>
-            <CardTitle>Users Encountered</CardTitle>
+            <CardTitle>Encountered Users</CardTitle>
             <UserNumberWithIconWrapper>
               <Icon as={BsFillPersonFill} boxSize={8} />
               <CardNumber>{props.encounterCount ?? '-'}</CardNumber>
@@ -458,7 +458,7 @@ const Summary: React.FC<Props> = (props) => {
           />
         </InstanceTypeCard>
         <MostVisitedWorldCard>
-          <CardTitle>Most Visited World</CardTitle>
+          <CardTitle>Most Visited Worlds</CardTitle>
           <TableContainer>
             <Table variant="simple" size="sm">
               <Thead>
