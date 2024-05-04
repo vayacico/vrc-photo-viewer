@@ -1,18 +1,35 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
-import { State } from '../reducers';
-import Summary from '../component/summary/Summary';
-import { AppDispatch } from '../createStore';
-import { getSummaryData } from '../reducers/summaryData';
-import { InstanceType, WeekDay } from '../../dto/ActivityStatisticsData';
-import { pageModeActions } from '../reducers/pageMode';
+import { useToast } from '@chakra-ui/react';
+import { State } from '../../reducers';
+import Summary from '../../component/summary/Summary';
+import { AppDispatch } from '../../createStore';
+import { getSummaryData } from '../../reducers/summaryData';
+import { InstanceType, WeekDay } from '../../../dto/ActivityStatisticsData';
+import { pageModeActions } from '../../reducers/pageMode';
 
 const SummaryContainer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const toast = useToast();
   const summaryData = useSelector((state: State) => state.summary);
   const dateRef = useRef<Date>(summaryData.date);
   dateRef.current = summaryData.date;
+
+  useEffect(() => {
+    if (summaryData.isError) {
+      toast({
+        title: 'ERROR',
+        description: summaryData.errorMessage,
+        position: 'bottom-right',
+        status: 'error',
+        isClosable: false,
+        containerStyle: {
+          marginBottom: 4,
+        },
+      });
+    }
+  }, [summaryData.isError, summaryData.errorMessage]);
 
   const setDate = (date: Date) => {
     dispatch(getSummaryData(date));

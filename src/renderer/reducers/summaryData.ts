@@ -61,32 +61,32 @@ export const getSummaryData = createAsyncThunk<
     return {
       status: joinCountByWorldName.status,
       errorCode: joinCountByWorldName.errorCode,
-      errorMessage: joinCountByWorldName.message,
-    } as unknown as ErrorResponse;
+      message: joinCountByWorldName.message,
+    } as ErrorResponse;
   }
   if (joinCountByUserName.status === 'failed') {
     console.error(joinCountByUserName.message);
     return {
       status: joinCountByUserName.status,
       errorCode: joinCountByUserName.errorCode,
-      errorMessage: joinCountByUserName.message,
-    } as unknown as ErrorResponse;
+      message: joinCountByUserName.message,
+    } as ErrorResponse;
   }
   if (joinCountByInstanceType.status === 'failed') {
     console.error(joinCountByInstanceType.message);
     return {
       status: joinCountByInstanceType.status,
       errorCode: joinCountByInstanceType.errorCode,
-      errorMessage: joinCountByInstanceType.message,
-    } as unknown as ErrorResponse;
+      message: joinCountByInstanceType.message,
+    } as ErrorResponse;
   }
   if (activityHeatmap.status === 'failed') {
     console.error(activityHeatmap.message);
     return {
       status: activityHeatmap.status,
       errorCode: activityHeatmap.errorCode,
-      errorMessage: activityHeatmap.message,
-    } as unknown as ErrorResponse;
+      message: activityHeatmap.message,
+    } as ErrorResponse;
   }
   return {
     date: from,
