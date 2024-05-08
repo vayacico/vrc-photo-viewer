@@ -15,8 +15,17 @@ import { AppDispatch } from '../../createStore';
 import { pageModeActions } from '../../reducers/pageMode';
 import { getSummaryData } from '../../reducers/summaryData';
 import SummaryContainer from '../summary/SummaryContainer';
+import { ScanResultResponse } from '../../../dto/ScanResult';
+import { ErrorResponse } from '../../../dto/ActivityLog';
 
-const ContentContainer: React.FC = () => {
+interface Props {
+  isScanning: boolean;
+  scanPhoto: (
+    isRefresh: boolean
+  ) => Promise<ScanResultResponse | ErrorResponse>;
+}
+
+const ContentContainer: React.FC<Props> = (props) => {
   const pageMode = useSelector((state: State) => state.pageMode.current);
   const isGetPhotoError = useSelector(
     (state: State) => state.imageGallery.isError
@@ -110,7 +119,10 @@ const ContentContainer: React.FC = () => {
    * 写真のスキャンをトリガーして結果に応じてトーストを出す
    */
   const scanPhoto = async () => {
-    const response = await window.service.log.scanPhoto(false);
+    if (props.isScanning) {
+      return;
+    }
+    const response = await props.scanPhoto(false);
     if (response.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
@@ -155,7 +167,11 @@ const ContentContainer: React.FC = () => {
           },
         });
       }
-    } else {
+    } else if (response.status === 'isScanning') {
+      if (scanningToastRef.current) {
+        toast.close(scanningToastRef.current);
+      }
+    } else if (response.status === 'failed') {
       if (scanningToastRef.current) {
         toast.close(scanningToastRef.current);
       }
@@ -230,7 +246,12 @@ const ContentContainer: React.FC = () => {
       pageMode.mode === 'PHOTO_DETAIL_FOR_SEARCH' ? (
         <PhotoDetailContainer />
       ) : null}
-      {pageMode.mode === 'SETTING' ? <SettingContainer /> : null}
+      {pageMode.mode === 'SETTING' ? (
+        <SettingContainer
+          isScanning={props.isScanning}
+          scanPhoto={props.scanPhoto}
+        />
+      ) : null}
     </Contents>
   );
 };

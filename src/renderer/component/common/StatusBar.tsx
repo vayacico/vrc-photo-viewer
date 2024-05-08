@@ -1,10 +1,11 @@
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { BsArrowClockwise } from 'react-icons/bs';
 import React from 'react';
 
 interface Props {
   statusText?: string;
   onClickReloadButton: (e: React.MouseEvent) => void;
+  isScanning: boolean;
 }
 
 const Wrapper = styled.div`
@@ -38,10 +39,24 @@ const ReloadIconButton = styled.div`
   }
 `;
 
-const ReloadIcon = styled(BsArrowClockwise)`
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const ReloadIcon = styled(BsArrowClockwise)<{ isScanning: boolean }>`
   margin-top: 4px;
   margin-left: 4px;
   color: white;
+  ${(props) =>
+    props.isScanning &&
+    css`
+      animation: ${rotate} 0.5s linear infinite;
+    `}
 `;
 
 const StatusBar: React.FC<Props> = (props) => {
@@ -49,7 +64,7 @@ const StatusBar: React.FC<Props> = (props) => {
     <Wrapper>
       <Text>{props.statusText}</Text>
       <ReloadIconButton onClick={props.onClickReloadButton}>
-        <ReloadIcon />
+        <ReloadIcon isScanning={props.isScanning} />
       </ReloadIconButton>
     </Wrapper>
   );

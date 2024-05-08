@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import StatusBar from '../../component/common/StatusBar';
@@ -7,8 +7,17 @@ import { State } from '../../reducers';
 import { AppDispatch } from '../../createStore';
 import { getActivity } from '../../reducers/activityData';
 import { getWorld } from '../../reducers/worldData';
+import { ErrorResponse } from '../../../dto/ActivityLog';
+import { ScanResultResponse } from '../../../dto/ScanResult';
 
-const StatusBarContainer: React.FC = () => {
+interface Props {
+  isScanning: boolean;
+  scanPhoto: (
+    isRefresh: boolean
+  ) => Promise<ScanResultResponse | ErrorResponse>;
+}
+
+const StatusBarContainer: React.FC<Props> = (props) => {
   const statusText = useSelector((state: State) => state.status.text);
   const isLoadingWorld = useSelector(
     (state: State) => state.worldData.isLoading
@@ -40,7 +49,10 @@ const StatusBarContainer: React.FC = () => {
    * 写真のスキャンをトリガーして結果に応じてトーストを出す
    */
   const scanPhoto = async () => {
-    const response = await window.service.log.scanPhoto(false);
+    if (props.isScanning) {
+      return;
+    }
+    const response = await props.scanPhoto(false);
     if (response.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
@@ -80,7 +92,11 @@ const StatusBarContainer: React.FC = () => {
           },
         });
       }
-    } else {
+    } else if (response.status === 'isScanning') {
+      if (scanningToastRef.current) {
+        toast.close(scanningToastRef.current);
+      }
+    } else if (response.status === 'failed') {
       if (scanningToastRef.current) {
         toast.close(scanningToastRef.current);
       }
@@ -139,6 +155,12 @@ const StatusBarContainer: React.FC = () => {
     scan();
   };
 
-  return <StatusBar onClickReloadButton={reload} statusText={statusText} />;
+  return (
+    <StatusBar
+      onClickReloadButton={reload}
+      statusText={statusText}
+      isScanning={props.isScanning}
+    />
+  );
 };
 export default StatusBarContainer;

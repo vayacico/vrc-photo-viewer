@@ -61,6 +61,7 @@
     "apply": {
       "button": "適用",
       "loading": "適用中",
+      "scanningMessage": "写真のスキャンが進行中です。完了後に設定の反映が可能になります。",
       "successMessage": "データベースの読み取りと写真のスキャンが完了しました",
       "errorMessage": "設定の保存中にエラーが発生しました"
     }
