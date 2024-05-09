@@ -61,6 +61,7 @@
     "apply": {
       "button": "Apply",
       "loading": "Loading...",
+      "scanningMessage": "The scanning of the photo is in progress. Settings can be applied after completion.",
       "successMessage": "Success to load database and scan photo.",
       "errorMessage": "Failed to load database or scan photo."
     }

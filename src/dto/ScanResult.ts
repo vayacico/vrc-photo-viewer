@@ -1,5 +1,5 @@
 export interface ScanResultResponse {
-  status: 'success';
+  status: 'success' | 'isScanning';
   oldPhotoCount: number;
   photoCount: number;
 }

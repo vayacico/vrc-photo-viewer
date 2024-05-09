@@ -20,6 +20,8 @@ interface Props {
   databaseFilePath: string | null;
   photoDirectoryPaths: string[];
   applyStatus: 'NOT_YET' | 'LOADING' | 'SUCCESS' | 'ERROR';
+
+  isScanning: boolean;
   language: string;
   setLanguage: (lang: string) => void;
   errorMessage: string | null;
@@ -240,6 +242,7 @@ const Setting: React.FC<Props> = (props) => {
             </Area>
             <ApplyButton
               isLoading={props.applyStatus === 'LOADING'}
+              isDisabled={props.isScanning}
               loadingText="Loading"
               size="sm"
               borderRadius={0}
@@ -250,6 +253,12 @@ const Setting: React.FC<Props> = (props) => {
             >
               {t('setting.apply.button')}
             </ApplyButton>
+            {props.applyStatus !== 'LOADING' && props.isScanning ? (
+              <Alert status="info" width="95%">
+                <AlertIcon />
+                {t('setting.apply.scanningMessage')}
+              </Alert>
+            ) : null}
 
             {props.applyStatus === 'SUCCESS' ? (
               <Alert status="success" width="95%">

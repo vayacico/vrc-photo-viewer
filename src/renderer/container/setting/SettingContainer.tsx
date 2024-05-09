@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Setting from '../../component/setting/Setting';
 import { State } from '../../reducers';
@@ -7,8 +7,17 @@ import { getActivity } from '../../reducers/activityData';
 import { getWorld } from '../../reducers/worldData';
 import { AppDispatch } from '../../createStore';
 import { statusActions } from '../../reducers/status';
+import { ErrorResponse } from '../../../dto/ActivityLog';
+import { ScanResultResponse } from '../../../dto/ScanResult';
 
-const SettingContainer: React.FC = () => {
+interface Props {
+  isScanning: boolean;
+  scanPhoto: (
+    isRefresh: boolean
+  ) => Promise<ScanResultResponse | ErrorResponse>;
+}
+
+const SettingContainer: React.FC<Props> = (props) => {
   const mode = useSelector((state: State) => state.pageMode.current.mode);
   const isLoadingWorld = useSelector(
     (state: State) => state.worldData.isLoading
@@ -104,7 +113,7 @@ const SettingContainer: React.FC = () => {
       databaseFilePath,
       imageDirectoryPaths: photoDirectoryPaths,
     });
-    const scanResult = await window.service.log.scanPhoto(true);
+    const scanResult = await props.scanPhoto(true);
     if (updateResult.status === 'success' && scanResult.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
@@ -137,6 +146,7 @@ const SettingContainer: React.FC = () => {
       apply={apply}
       errorMessage={errorMessage}
       applyStatus={applyStatus}
+      isScanning={props.isScanning}
       version={version}
       setStatus={setStatus}
     />

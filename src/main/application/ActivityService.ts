@@ -23,6 +23,8 @@ export default class ActivityService {
 
   internalDatabaseRepository: InternalDatabaseRepository;
 
+  scanLock: boolean = false;
+
   constructor() {
     this.activityLogRepository = new ActivityLogRepositoryImpl();
     this.photoFileRepository = new PhotoFileRepositoryImpl();
@@ -350,52 +352,68 @@ export default class ActivityService {
    * @param refresh 更新前に初期化するかどうか
    */
   public async scanPhoto(refresh: boolean): Promise<ScanResult> {
-    // フラグがtrueなら格納前に削除
-    if (refresh) {
-      await this.internalDatabaseRepository.deleteAll();
+    // スキャンが実行中ならエラーを返す
+    if (this.scanLock) {
+      throw new Error('Scan is already running');
     }
+    try {
+      // スキャン中フラグを立てる
+      this.scanLock = true;
+      // フラグがtrueなら格納前に削除
+      if (refresh) {
+        await this.internalDatabaseRepository.deleteAll();
+      }
 
-    // 現在の内容をDBから取得
-    const databasePathList = (
-      await this.internalDatabaseRepository.getAllPhoto()
-    ).map((item) => item.originalFilePath);
-    const databasePathSet = new Set(databasePathList);
+      // 現在の内容をDBから取得
+      const databasePathList = (
+        await this.internalDatabaseRepository.getAllPhoto()
+      ).map((item) => item.originalFilePath);
+      const databasePathSet = new Set(databasePathList);
 
-    // ディレクトリ配下のパスリストを取得
-    const filePathList = await this.photoFileRepository.getPhotoFilePathList(
-      await this.settingRepository.getPhotoDirectoryLocations()
-    );
-    const filePathSet = new Set(filePathList);
+      // ディレクトリ配下のパスリストを取得
+      const filePathList = await this.photoFileRepository.getPhotoFilePathList(
+        await this.settingRepository.getPhotoDirectoryLocations()
+      );
+      const filePathSet = new Set(filePathList);
 
-    // 追加と削除するファイルのリストを作成
-    const addPath = filePathList.filter((item) => !databasePathSet.has(item));
-    const deletePath = databasePathList.filter(
-      (item) => !filePathSet.has(item)
-    );
+      // 追加と削除するファイルのリストを作成
+      const addPath = filePathList.filter((item) => !databasePathSet.has(item));
+      const deletePath = databasePathList.filter(
+        (item) => !filePathSet.has(item)
+      );
 
-    // 追加対象についてファイル情報を取得
-    const addPhoto = await this.photoFileRepository.getFileStatsList(addPath);
+      // 追加対象についてファイル情報を取得
+      const addPhoto = await this.photoFileRepository.getFileStatsList(addPath);
 
-    // 挿入前のデータ数を取得
-    const oldPhotoCount = await this.internalDatabaseRepository.getPhotoCount();
+      // 挿入前のデータ数を取得
+      const oldPhotoCount =
+        await this.internalDatabaseRepository.getPhotoCount();
 
-    // 追加対象をSQLiteに格納
-    await this.internalDatabaseRepository.insertPhotos(
-      addPhoto.map((file) => {
-        return {
-          path: file.originalFilePath,
-          createDate: file.createdDate,
-        } as PhotoEntity;
-      })
-    );
+      // 追加対象をSQLiteに格納
+      await this.internalDatabaseRepository.insertPhotos(
+        addPhoto.map((file) => {
+          return {
+            path: file.originalFilePath,
+            createDate: file.createdDate,
+          } as PhotoEntity;
+        })
+      );
 
-    // 削除対象をSQLiteから削除
-    await this.internalDatabaseRepository.deletePhotos(deletePath);
+      // 削除対象をSQLiteから削除
+      await this.internalDatabaseRepository.deletePhotos(deletePath);
 
-    return {
-      oldPhotoCount,
-      photoCount: oldPhotoCount + addPhoto.length,
-    };
+      // スキャン中フラグを解除
+      this.scanLock = false;
+
+      return {
+        oldPhotoCount,
+        photoCount: oldPhotoCount + addPhoto.length,
+      };
+    } catch (e) {
+      // スキャン中フラグを解除
+      this.scanLock = false;
+      throw e;
+    }
   }
 
   /**
