@@ -134,25 +134,31 @@ const StatusBarContainer: React.FC<Props> = (props) => {
   }, [isLoadingPhoto, isLoadingWorld]);
 
   const reload = () => {
-    const scan = async () => {
-      if (isLoading) {
-        return;
-      }
-      setIsLoading(true);
-      scanningToastRef.current = toast({
-        description: t('toast.scanning.description'),
-        position: 'bottom-right',
-        status: 'loading',
-        isClosable: false,
-        duration: null,
-        containerStyle: {
-          marginBottom: 4,
-        },
+    if (props.isScanning || isLoading) {
+      return;
+    }
+    setIsLoading(true);
+    if (scanningToastRef.current) {
+      toast.close(scanningToastRef.current);
+    }
+    scanningToastRef.current = toast({
+      description: t('toast.scanning.description'),
+      position: 'bottom-right',
+      status: 'loading',
+      isClosable: false,
+      duration: null,
+      containerStyle: {
+        marginBottom: 4,
+      },
+    });
+    scanPhoto()
+      // eslint-disable-next-line promise/always-return
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
       });
-      await scanPhoto();
-      setIsLoading(false);
-    };
-    scan();
   };
 
   return (
