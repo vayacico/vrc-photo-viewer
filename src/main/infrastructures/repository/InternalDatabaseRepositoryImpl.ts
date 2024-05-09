@@ -24,7 +24,7 @@ export default class InternalDatabaseRepositoryImpl
     if (!this.dataSource.isInitialized) {
       await this.dataSource.initialize();
       await this.dataSource.query('PRAGMA journal_mode = OFF');
-      await this.dataSource.query('PRAGMA synchronous  =  OFF');
+      await this.dataSource.query('PRAGMA synchronous  =  NORMAL');
     }
   }
 
