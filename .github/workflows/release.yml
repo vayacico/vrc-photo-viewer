@@ -74,6 +74,12 @@ jobs:
           draft: true
           prerelease: true
 
+      - name: Create booth zip
+        run: |
+          $installerPath = "${{ env.build_binary_path }}"
+          (Get-Content .github/resource/readme.txt -Encoding utf8) -replace '{{installer}}', $installerPath | Set-Content .github/resource/readme.txt -Encoding utf8
+          Compress-Archive -Path .github/resource/readme.txt, .github/resource/LICENSE.txt, $installerPath -DestinationPath "VRCPhotoViewer_${{ env.VERSION }}.zip"
+
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
@@ -85,3 +91,15 @@ jobs:
           asset_path: ${{ env.build_binary_path }}
           asset_name: ${{ env.build_binary_name }}
           asset_content_type: application/exe
+
+      - name: Upload Booth Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          node-version: 20
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./VRCPhotoViewer_${{ env.VERSION }}.zip
+          asset_name: VRCPhotoViewer_${{ env.VERSION }}.zip
+          asset_content_type: application/zip
