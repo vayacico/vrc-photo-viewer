@@ -66,14 +66,14 @@ jobs:
         run: |
           $installerPath = "${{ env.build_binary_path }}"
           (Get-Content .github/resource/readme.txt -Encoding utf8) -replace '{{installer}}', $installerPath | Set-Content .github/resource/readme.txt -Encoding utf8
-          Compress-Archive -Path .github/resource/readme.txt, .github/resource/LICENSE.txt, $installerPath -DestinationPath "VRCPhotoViewer_${{ env.VERSION }}.zip"
+          Compress-Archive -Path .github/resource/readme.txt, .github/resource/LICENSE.txt, $installerPath -DestinationPath "VRCPhotoViewer_${{ env.app_version }}.zip"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{ env.build_binary_path }}
-            ./VRCPhotoViewer_${{ env.VERSION }}.zip
+            ./VRCPhotoViewer_${{ env.app_version }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.app_version }}
           release_name: ${{ env.app_version }}
