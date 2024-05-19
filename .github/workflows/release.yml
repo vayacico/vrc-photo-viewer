@@ -65,6 +65,7 @@ jobs:
       - name: Create booth zip
         run: |
           $installerName = "${{ env.build_binary_name }}"
+          $installerPath = "${{ env.build_binary_path }}"
           (Get-Content .github/resource/readme.txt -Encoding utf8) -replace '{{installer}}', $installerName | Set-Content .github/resource/readme.txt -Encoding utf8
           Compress-Archive -Path .github/resource/readme.txt, .github/resource/LICENSE.txt, $installerPath -DestinationPath "VRCPhotoViewer_${{ env.app_version }}.zip"
 
