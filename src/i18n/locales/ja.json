@@ -4,6 +4,12 @@
     "directoryNotSet": "写真ファイルのディレクトリが設定されていません",
     "unknown": "データベースファイルを開こうとした際に予期せぬエラーが発生しました"
   },
+  "panel": {
+    "copyWorldName": "ワールド名をコピー",
+    "copyWorldUrl": "URLをコピー",
+    "copyFilePath": "ファイルパスをコピー",
+    "copied": "コピーしました"
+  },
   "toast": {
     "scanning": {
       "description": "スキャン中"
