@@ -4,6 +4,12 @@
     "directoryNotSet": "Please set the photo file location.",
     "unknown": "An unknown error occurred while opening the database file."
   },
+  "panel": {
+    "copyWorldName": "Copy name",
+    "copyWorldUrl": "Copy url",
+    "copyFilePath": "Copy Path",
+    "copied": "Copied!"
+  },
   "toast": {
     "scanning": {
       "description": "Scanning images now."
