@@ -1,1 +1,1 @@
-vrc-photo-viewer 2.0.3 (cef3cab)
+vrc-photo-viewer 2.1.3 (a66b759)
