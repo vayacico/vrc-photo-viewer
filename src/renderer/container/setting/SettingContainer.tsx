@@ -37,7 +37,7 @@ const SettingContainer: React.FC<Props> = (props) => {
     (state: State) => state.imageGallery.errorMessage
   );
 
-  const [databaseFilePath, setDatabaseFilePath] = useState('None');
+  const [databaseFilePaths, setDatabaseFilePaths] = useState<string[]>([]);
   const [photoDirectoryPaths, setPhotoDirectoryPaths] = useState(
     [] as string[]
   );
@@ -55,7 +55,7 @@ const SettingContainer: React.FC<Props> = (props) => {
   };
   const getDatabaseFilePath = async () => {
     const dbFilePath = await window.service.settings.getDbFileLocation();
-    setDatabaseFilePath(dbFilePath);
+    setDatabaseFilePaths(dbFilePath);
   };
   const getPhotoDirectoryPaths = async () => {
     const paths = await window.service.settings.getPhotoDirectoryLocations();
@@ -89,7 +89,7 @@ const SettingContainer: React.FC<Props> = (props) => {
     // ファイル選択機能の呼び出し
     const path = await window.service.settings.selectDbFileLocation();
     if (path) {
-      setDatabaseFilePath(path);
+      setDatabaseFilePaths([...databaseFilePaths, path]);
     }
   };
 
@@ -102,6 +102,11 @@ const SettingContainer: React.FC<Props> = (props) => {
     }
   };
 
+  const deleteDatabaseFilePath = async (path: string) => {
+    // ファイルリストから削除
+    setDatabaseFilePaths(databaseFilePaths.filter((item) => item !== path));
+  };
+
   const deletePhotoDirectoryPath = async (path: string) => {
     // ディレクトリリストから削除
     setPhotoDirectoryPaths(photoDirectoryPaths.filter((item) => item !== path));
@@ -110,7 +115,7 @@ const SettingContainer: React.FC<Props> = (props) => {
   const apply = async () => {
     setApplyStatus('LOADING');
     const updateResult = await window.service.settings.updateFileSetting({
-      databaseFilePath,
+      databaseFilePath: databaseFilePaths,
       imageDirectoryPaths: photoDirectoryPaths,
     });
     const scanResult = await props.scanPhoto(true);
@@ -136,11 +141,12 @@ const SettingContainer: React.FC<Props> = (props) => {
   return (
     <Setting
       show={mode === 'SETTING'}
-      databaseFilePath={databaseFilePath}
+      databaseFilePaths={databaseFilePaths}
       photoDirectoryPaths={photoDirectoryPaths}
       language={i18n.language}
       setLanguage={setLanguage}
-      showUpdateDatabaseFilePathDialog={showUpdateDatabaseFilePathDialog}
+      showAddDatabaseFilePathDialog={showUpdateDatabaseFilePathDialog}
+      deleteDatabaseFilePath={deleteDatabaseFilePath}
       showAddPhotoDirectoryDialog={showAddPhotoDirectoryDialog}
       deletePhotoDirectoryPath={deletePhotoDirectoryPath}
       apply={apply}

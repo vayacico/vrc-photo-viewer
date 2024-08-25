@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import { BsCheckLg, BsFillPencilFill, BsX } from 'react-icons/bs';
+import { BsCheckLg, BsX } from 'react-icons/bs';
 import React from 'react';
 import {
   Alert,
@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   show: boolean;
-  databaseFilePath: string | null;
+  databaseFilePaths: string[] | null;
   photoDirectoryPaths: string[];
   applyStatus: 'NOT_YET' | 'LOADING' | 'SUCCESS' | 'ERROR';
 
@@ -26,7 +26,8 @@ interface Props {
   setLanguage: (lang: string) => void;
   errorMessage: string | null;
   version: string;
-  showUpdateDatabaseFilePathDialog: () => Promise<void>;
+  showAddDatabaseFilePathDialog: () => Promise<void>;
+  deleteDatabaseFilePath: (path: string) => Promise<void>;
   showAddPhotoDirectoryDialog: () => Promise<void>;
   deletePhotoDirectoryPath: (path: string) => Promise<void>;
   apply: () => Promise<void>;
@@ -103,22 +104,6 @@ const AddDirectButton = styled.button`
   }
 `;
 
-const EditIcon = styled.div`
-  position: absolute;
-  right: 8px;
-  top: 6px;
-  color: #bbbaba;
-  font-size: 0.8em;
-
-  &:hover {
-    color: #6b6b6b;
-  }
-
-  &:active {
-    color: #4f4f4f;
-  }
-`;
-
 const DeleteIcon = styled.div`
   position: absolute;
   right: 4px;
@@ -172,6 +157,17 @@ const LinkText = styled.a`
 const Setting: React.FC<Props> = (props) => {
   const { t } = useTranslation();
 
+  const databaseFileBoxes = props.databaseFilePaths?.map((item) => {
+    return (
+      <PathArea>
+        <Path>{item}</Path>
+        <DeleteIcon onClick={() => props.deleteDatabaseFilePath(item)}>
+          <BsX />
+        </DeleteIcon>
+      </PathArea>
+    );
+  });
+
   const photoDirectoryBoxes = props.photoDirectoryPaths.map((item) => {
     return (
       <PathArea>
@@ -221,14 +217,12 @@ const Setting: React.FC<Props> = (props) => {
             <Area>
               <Heading>{t('setting.db.heading')}</Heading>
               {databaseDescription}
-              <PathArea>
-                <Path>{props.databaseFilePath ?? ''}</Path>
-                <EditIcon
-                  onClick={() => props.showUpdateDatabaseFilePathDialog()}
-                >
-                  <BsFillPencilFill />
-                </EditIcon>
-              </PathArea>
+              {databaseFileBoxes}
+              <AddDirectButton
+                onClick={() => props.showAddDatabaseFilePathDialog()}
+              >
+                +
+              </AddDirectButton>
             </Area>
             <Area>
               <Heading>{t('setting.photoFolders.heading')}</Heading>
