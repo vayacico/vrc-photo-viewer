@@ -118,6 +118,11 @@ const SettingContainer: React.FC<Props> = (props) => {
       databaseFilePath: databaseFilePaths,
       imageDirectoryPaths: photoDirectoryPaths,
     });
+    if (updateResult.status === 'failed') {
+      setApplyStatus('ERROR');
+      setErrorMessage(updateResult.message ?? '');
+      return;
+    }
     const scanResult = await props.scanPhoto(true);
     if (updateResult.status === 'success' && scanResult.status === 'success') {
       dispatch(getActivity());
