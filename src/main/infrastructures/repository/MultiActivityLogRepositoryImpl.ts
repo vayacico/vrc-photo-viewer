@@ -106,7 +106,7 @@ export default class MultiActivityLogRepositoryImpl
                               WHERE a1.ActivityType = 0
                                 AND (a2.ID =
                                      (SELECT min(a3.ID)
-                                      FROM ActivityLogs a3
+                                      FROM temporaryTable a3
                                       WHERE a3.ID > a1.ID
                                         AND a3.ActivityType = 0))) leftDateTable
                              ON log.ID = leftDateTable.logId
@@ -178,7 +178,7 @@ export default class MultiActivityLogRepositoryImpl
                                 WHERE a1.ActivityType = 0
                                   AND (a2.ID =
                                        (SELECT min(a3.ID)
-                                        FROM ActivityLogs a3
+                                        FROM temporaryTable a3
                                         WHERE a3.ID > a1.ID
                                           AND a3.ActivityType = 0))) leftDateTable
                                ON log.ID = leftDateTable.logId
@@ -256,12 +256,12 @@ export default class MultiActivityLogRepositoryImpl
                                        a1.Timestamp joinDate,
                                        a2.ID        leftLogId,
                                        a2.Timestamp estimateLeftDate
-                                FROM ActivityLogs a1,
-                                     ActivityLogs a2
+                                FROM temporaryTable a1,
+                                     temporaryTable a2
                                 WHERE a1.ActivityType = 0
                                   AND (a2.ID =
                                        (SELECT min(a3.ID)
-                                        FROM ActivityLogs a3
+                                        FROM temporaryTable a3
                                         WHERE a3.ID > a1.ID
                                           AND a3.ActivityType = 0))) leftDateTable
                                ON log2.ID = leftDateTable.logId
