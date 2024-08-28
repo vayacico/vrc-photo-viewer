@@ -36,6 +36,7 @@ export default class MultiActivityLogRepositoryImpl
       SELECT *
       FROM ActivityLogs ${unionQuery}`
     );
+    await dataSource.query('CREATE INDEX tempIndex ON temporaryTable(ID)');
 
     return dataSource;
   }
