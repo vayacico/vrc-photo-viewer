@@ -23,7 +23,7 @@ export default class MultiActivityLogRepositoryImpl
     // 他のDBをアタッチ
     let unionQuery = '';
     for (let i = 1; i < paths.length; i += 1) {
-      await dataSource.query(`ATTACH DATABASE "${paths[1]}" AS "db${i}"`);
+      await dataSource.query(`ATTACH DATABASE "${paths[i]}" AS "db${i}"`);
       unionQuery += `UNION ALL SELECT * FROM db${i}.ActivityLogs `;
     }
 
