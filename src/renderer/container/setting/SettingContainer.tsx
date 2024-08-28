@@ -88,7 +88,7 @@ const SettingContainer: React.FC<Props> = (props) => {
   const showUpdateDatabaseFilePathDialog = async () => {
     // ファイル選択機能の呼び出し
     const path = await window.service.settings.selectDbFileLocation();
-    if (path) {
+    if (path && !databaseFilePaths.includes(path)) {
       setDatabaseFilePaths([...databaseFilePaths, path]);
     }
   };
@@ -96,7 +96,7 @@ const SettingContainer: React.FC<Props> = (props) => {
   const showAddPhotoDirectoryDialog = async () => {
     // ディレクトリ追加機能の呼び出し
     const path = await window.service.settings.selectPhotoDirectoryLocation();
-    if (path) {
+    if (path && !photoDirectoryPaths.includes(path)) {
       // ディレクトリリストに追加
       setPhotoDirectoryPaths([...photoDirectoryPaths, path]);
     }
@@ -122,9 +122,6 @@ const SettingContainer: React.FC<Props> = (props) => {
     if (updateResult.status === 'success' && scanResult.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
-    } else if (updateResult.status === 'failed') {
-      setApplyStatus('ERROR');
-      setErrorMessage(updateResult.message ?? '');
     } else if (scanResult.status === 'failed') {
       setApplyStatus('ERROR');
       setErrorMessage(scanResult.message);
@@ -153,6 +150,7 @@ const SettingContainer: React.FC<Props> = (props) => {
       errorMessage={errorMessage}
       applyStatus={applyStatus}
       isScanning={props.isScanning}
+      isValid={databaseFilePaths.length > 0 && photoDirectoryPaths.length > 0}
       version={version}
       setStatus={setStatus}
     />

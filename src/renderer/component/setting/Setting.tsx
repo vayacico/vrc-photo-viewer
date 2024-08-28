@@ -22,6 +22,7 @@ interface Props {
   applyStatus: 'NOT_YET' | 'LOADING' | 'SUCCESS' | 'ERROR';
 
   isScanning: boolean;
+  isValid: boolean;
   language: string;
   setLanguage: (lang: string) => void;
   errorMessage: string | null;
@@ -236,7 +237,7 @@ const Setting: React.FC<Props> = (props) => {
             </Area>
             <ApplyButton
               isLoading={props.applyStatus === 'LOADING'}
-              isDisabled={props.isScanning}
+              isDisabled={props.isScanning || !props.isValid}
               loadingText="Loading"
               size="sm"
               borderRadius={0}
