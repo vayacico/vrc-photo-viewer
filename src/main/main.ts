@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import i18n from 'i18next';
-import Backend from 'i18next-node-fs-backend';
+import Backend from 'i18next-fs-backend';
 import registerHandler from './interfaces/IpcHandler';
 import { resolveHtmlPath } from './util';
 import en from '../i18n/locales/en.json';
