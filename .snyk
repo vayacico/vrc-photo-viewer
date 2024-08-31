@@ -6,5 +6,5 @@ ignore:
     - '*':
         reason: react-queryで未対応なため
         expires: 2024-07-02T00:00:00.000Z
-        created: 2024-04-02T13:10:53.423Z
+        created: 2024-12-31T13:10:53.423Z
 patch: {}
