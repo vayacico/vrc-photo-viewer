@@ -1,5 +1,5 @@
 export interface SettingForm {
-  databaseFilePath: string;
+  databaseFilePath: string[];
   imageDirectoryPaths: string[];
 }
 

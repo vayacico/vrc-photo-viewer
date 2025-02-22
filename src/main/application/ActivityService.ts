@@ -1,10 +1,8 @@
 import { PhotoLog } from '../domain/model/dto/PhotoFile';
 import PhotoFileRepositoryImpl from '../infrastructures/repository/PhotoFileRepositoryImpl';
 import SettingsRepositoryImpl from '../infrastructures/repository/SettingsRepositoryImpl';
-import ActivityLogRepository from '../domain/model/ActivityLogRepository';
 import PhotoFileRepository from '../domain/model/PhotoFileRepository';
 import SettingRepository from '../domain/model/SettingRepository';
-import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 import DatabaseFilePathNotSetException from '../domain/model/exception/DatabaseFilePathNotSetException';
 import PhotoDirectoryNotSetException from '../domain/model/exception/PhotoDirectoryNotSetException';
 import { WorldData } from '../domain/model/dto/WorldList';
@@ -13,9 +11,15 @@ import InternalDatabaseRepositoryImpl from '../infrastructures/repository/Intern
 import PhotoEntity from '../infrastructures/entity/photoEntity';
 import { ScanResult } from '../domain/model/dto/scanResult';
 import { InstanceType } from '../../dto/ActivityStatisticsData';
+import MultiActivityLogRepository from '../domain/model/MultiActivityLogRepository';
+import MultiActivityLogRepositoryImpl from '../infrastructures/repository/MultiActivityLogRepositoryImpl';
+import ActivityLogRepository from '../domain/model/ActivityLogRepository';
+import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 
 export default class ActivityService {
   activityLogRepository: ActivityLogRepository;
+
+  multiActivityLogRepository: MultiActivityLogRepository;
 
   photoFileRepository: PhotoFileRepository;
 
@@ -27,6 +31,7 @@ export default class ActivityService {
 
   constructor() {
     this.activityLogRepository = new ActivityLogRepositoryImpl();
+    this.multiActivityLogRepository = new MultiActivityLogRepositoryImpl();
     this.photoFileRepository = new PhotoFileRepositoryImpl();
     this.settingRepository = new SettingsRepositoryImpl();
     this.internalDatabaseRepository = new InternalDatabaseRepositoryImpl();
@@ -43,9 +48,10 @@ export default class ActivityService {
     }
 
     // Joinログを取得
-    const joinLog = await this.activityLogRepository.getAllJoinLog(
-      databasePath
-    );
+    const joinLog =
+      databasePath.length === 1
+        ? await this.activityLogRepository.getAllJoinLog(databasePath[0])
+        : await this.multiActivityLogRepository.getAllJoinLog(databasePath);
 
     // Joinログと写真を突合（高負荷になるとUIが固まるので意図的にPromise.allを使わない）
     const result: PhotoLog[] = [];
@@ -75,15 +81,16 @@ export default class ActivityService {
    * 全ワールドログを取得
    */
   async getWorlds(): Promise<WorldData[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
     // 該当時間のJoinログを取得
-    const joinLog = await this.activityLogRepository.getAllJoinLog(
-      databasePath
-    );
+    const joinLog =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getAllJoinLog(databasePaths[0])
+        : await this.multiActivityLogRepository.getAllJoinLog(databasePaths);
 
     const result: WorldData[] = [];
     for (let i = 0; i < joinLog.length; i += 1) {
@@ -110,15 +117,22 @@ export default class ActivityService {
    * @param to 終了期間
    */
   async getUsers(from: Date, to: Date): Promise<string[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
-    const userLogs = await this.activityLogRepository.getUserJoinLog(
-      databasePath,
-      from,
-      to
-    );
+    const userLogs =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getUserJoinLog(
+            databasePaths[0],
+            from,
+            to
+          )
+        : await this.multiActivityLogRepository.getUserJoinLog(
+            databasePaths,
+            from,
+            to
+          );
     return userLogs.map((log) => log.userName);
   }
 
@@ -127,8 +141,8 @@ export default class ActivityService {
    * @param keyword キーワード
    */
   public async searchPhotosByUserName(keyword: string): Promise<PhotoLog[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -136,11 +150,18 @@ export default class ActivityService {
     const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
 
     // キーワードをもとにJoinログを取得
-    const joinLog = await this.activityLogRepository.getJoinLogByUserName(
-      databasePath,
-      queryKeyword,
-      { instanceType: filter.instanceType }
-    );
+    const joinLog =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getJoinLogByUserName(
+            databasePaths[0],
+            queryKeyword,
+            { instanceType: filter.instanceType }
+          )
+        : await this.multiActivityLogRepository.getJoinLogByUserName(
+            databasePaths,
+            queryKeyword,
+            { instanceType: filter.instanceType }
+          );
 
     // Joinログの範囲に撮影された写真を検索（UIが固まるのでPromise.allを使わない）
     const result: PhotoLog[] = [];
@@ -184,8 +205,8 @@ export default class ActivityService {
    * @param keyword キーワード
    */
   public async searchPhotosByWorldName(keyword: string): Promise<PhotoLog[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -199,11 +220,18 @@ export default class ActivityService {
     const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
 
     // キーワードを元にJoinログを検索
-    const joinLog = await this.activityLogRepository.getJoinLogByWorldName(
-      databasePath,
-      queryKeyword,
-      { instanceType: filter.instanceType }
-    );
+    const joinLog =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getJoinLogByWorldName(
+            databasePaths[0],
+            queryKeyword,
+            { instanceType: filter.instanceType }
+          )
+        : await this.multiActivityLogRepository.getJoinLogByWorldName(
+            databasePaths,
+            queryKeyword,
+            { instanceType: filter.instanceType }
+          );
 
     // Joinログの範囲に撮影された写真を検索（UIが固まるのでPromise.allを使わない）
     const result: PhotoLog[] = [];
@@ -246,8 +274,8 @@ export default class ActivityService {
    * @param keyword キーワード
    */
   public async searchWorldsByUserName(keyword: string): Promise<WorldData[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -255,11 +283,18 @@ export default class ActivityService {
     const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
 
     // キーワードを元にJoinログを検索
-    const joinLog = await this.activityLogRepository.getJoinLogByUserName(
-      databasePath,
-      queryKeyword,
-      filter
-    );
+    const joinLog =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getJoinLogByUserName(
+            databasePaths[0],
+            queryKeyword,
+            filter
+          )
+        : await this.multiActivityLogRepository.getJoinLogByUserName(
+            databasePaths,
+            queryKeyword,
+            filter
+          );
 
     // 該当時間帯に写真があるワールドにフィルターして返す
     const result: WorldData[] = [];
@@ -286,8 +321,8 @@ export default class ActivityService {
    * @param keyword
    */
   public async searchWorldsByWorldName(keyword: string): Promise<WorldData[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -295,11 +330,18 @@ export default class ActivityService {
     const { keywords: queryKeyword, filter } = this.parseQuery(keyword);
 
     // キーワードを元にJoinログを検索
-    const joinLog = await this.activityLogRepository.getJoinLogByWorldName(
-      databasePath,
-      queryKeyword,
-      filter
-    );
+    const joinLog =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getJoinLogByWorldName(
+            databasePaths[0],
+            queryKeyword,
+            filter
+          )
+        : await this.multiActivityLogRepository.getJoinLogByWorldName(
+            databasePaths,
+            queryKeyword,
+            filter
+          );
 
     // 該当時間帯に写真があるワールドにフィルターして返す
     const result: WorldData[] = [];
@@ -326,12 +368,17 @@ export default class ActivityService {
    * @param keyword キーワード
    */
   async getWorldSuggestion(keyword: string): Promise<string[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
-    return this.activityLogRepository.getWorldSuggestion(databasePath, keyword);
+    return databasePaths.length === 1
+      ? this.activityLogRepository.getWorldSuggestion(databasePaths[0], keyword)
+      : this.multiActivityLogRepository.getWorldSuggestion(
+          databasePaths,
+          keyword
+        );
   }
 
   /**
@@ -339,12 +386,17 @@ export default class ActivityService {
    * @param keyword キーワード
    */
   async getUserSuggestion(keyword: string): Promise<string[]> {
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths) {
       throw new DatabaseFilePathNotSetException();
     }
 
-    return this.activityLogRepository.getUserSuggestion(databasePath, keyword);
+    return databasePaths.length === 1
+      ? this.activityLogRepository.getUserSuggestion(databasePaths[0], keyword)
+      : this.multiActivityLogRepository.getUserSuggestion(
+          databasePaths,
+          keyword
+        );
   }
 
   /**

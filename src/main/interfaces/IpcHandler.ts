@@ -201,6 +201,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           }),
         } as PhotoResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -236,6 +237,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           }),
         } as PhotoResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -269,6 +271,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           }),
         } as WorldResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -302,6 +305,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           }),
         } as WorldResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',
@@ -335,6 +339,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data: await statisticsService.getWorldJoinedCount(from, to),
         } as WorldJoinCountResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseFilePathNotSetException) {
           return {
             status: 'failed',
@@ -367,6 +372,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data: await statisticsService.getUserJoinedCount(from, to),
         } as UserJoinCountResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseFilePathNotSetException) {
           return {
             status: 'failed',
@@ -400,6 +406,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           count: photoCount,
         } as PhotoCountResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseFilePathNotSetException) {
           return {
             status: 'failed',
@@ -433,6 +440,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data: heatMap,
         } as ActivityStaticsDataResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseFilePathNotSetException) {
           return {
             status: 'failed',
@@ -466,6 +474,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           data,
         } as WorldTypeJoinStatisticsDataResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseFilePathNotSetException) {
           return {
             status: 'failed',
@@ -527,6 +536,7 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
           message: 'success',
         } as ApplyResponse;
       } catch (e) {
+        console.log(e);
         if (e instanceof DatabaseErrorException) {
           return {
             status: 'failed',

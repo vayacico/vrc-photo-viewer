@@ -37,7 +37,7 @@ const SettingContainer: React.FC<Props> = (props) => {
     (state: State) => state.imageGallery.errorMessage
   );
 
-  const [databaseFilePath, setDatabaseFilePath] = useState('None');
+  const [databaseFilePaths, setDatabaseFilePaths] = useState<string[]>([]);
   const [photoDirectoryPaths, setPhotoDirectoryPaths] = useState(
     [] as string[]
   );
@@ -55,7 +55,7 @@ const SettingContainer: React.FC<Props> = (props) => {
   };
   const getDatabaseFilePath = async () => {
     const dbFilePath = await window.service.settings.getDbFileLocation();
-    setDatabaseFilePath(dbFilePath);
+    setDatabaseFilePaths(dbFilePath);
   };
   const getPhotoDirectoryPaths = async () => {
     const paths = await window.service.settings.getPhotoDirectoryLocations();
@@ -88,18 +88,23 @@ const SettingContainer: React.FC<Props> = (props) => {
   const showUpdateDatabaseFilePathDialog = async () => {
     // ファイル選択機能の呼び出し
     const path = await window.service.settings.selectDbFileLocation();
-    if (path) {
-      setDatabaseFilePath(path);
+    if (path && !databaseFilePaths.includes(path)) {
+      setDatabaseFilePaths([...databaseFilePaths, path]);
     }
   };
 
   const showAddPhotoDirectoryDialog = async () => {
     // ディレクトリ追加機能の呼び出し
     const path = await window.service.settings.selectPhotoDirectoryLocation();
-    if (path) {
+    if (path && !photoDirectoryPaths.includes(path)) {
       // ディレクトリリストに追加
       setPhotoDirectoryPaths([...photoDirectoryPaths, path]);
     }
+  };
+
+  const deleteDatabaseFilePath = async (path: string) => {
+    // ファイルリストから削除
+    setDatabaseFilePaths(databaseFilePaths.filter((item) => item !== path));
   };
 
   const deletePhotoDirectoryPath = async (path: string) => {
@@ -110,16 +115,18 @@ const SettingContainer: React.FC<Props> = (props) => {
   const apply = async () => {
     setApplyStatus('LOADING');
     const updateResult = await window.service.settings.updateFileSetting({
-      databaseFilePath,
+      databaseFilePath: databaseFilePaths,
       imageDirectoryPaths: photoDirectoryPaths,
     });
+    if (updateResult.status === 'failed') {
+      setApplyStatus('ERROR');
+      setErrorMessage(updateResult.message ?? '');
+      return;
+    }
     const scanResult = await props.scanPhoto(true);
     if (updateResult.status === 'success' && scanResult.status === 'success') {
       dispatch(getActivity());
       dispatch(getWorld());
-    } else if (updateResult.status === 'failed') {
-      setApplyStatus('ERROR');
-      setErrorMessage(updateResult.message ?? '');
     } else if (scanResult.status === 'failed') {
       setApplyStatus('ERROR');
       setErrorMessage(scanResult.message);
@@ -136,17 +143,19 @@ const SettingContainer: React.FC<Props> = (props) => {
   return (
     <Setting
       show={mode === 'SETTING'}
-      databaseFilePath={databaseFilePath}
+      databaseFilePaths={databaseFilePaths}
       photoDirectoryPaths={photoDirectoryPaths}
       language={i18n.language}
       setLanguage={setLanguage}
-      showUpdateDatabaseFilePathDialog={showUpdateDatabaseFilePathDialog}
+      showAddDatabaseFilePathDialog={showUpdateDatabaseFilePathDialog}
+      deleteDatabaseFilePath={deleteDatabaseFilePath}
       showAddPhotoDirectoryDialog={showAddPhotoDirectoryDialog}
       deletePhotoDirectoryPath={deletePhotoDirectoryPath}
       apply={apply}
       errorMessage={errorMessage}
       applyStatus={applyStatus}
       isScanning={props.isScanning}
+      isValid={databaseFilePaths.length > 0 && photoDirectoryPaths.length > 0}
       version={version}
       setStatus={setStatus}
     />
