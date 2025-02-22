@@ -18,11 +18,24 @@ jobs:
         run: |
           npm ci
 
-      - name: npm test
+      - name: package
         run: |
           $APP_NAME=cat .\release\app\package.json | jq -r '.name'
-          $APP_VERSION=cat .\release\app\package.json | jq -r '.version'
+          $APP_VERSION="pr-${{ github.event.pull_request.number }}"
           $GIT_HASH=git rev-parse --short HEAD
           echo -n "$APP_NAME $APP_VERSION ($GIT_HASH)" | Out-File -FilePath  .\assets\version.txt -Encoding utf8
           npm run postinstall
           npm run package
+
+      - name: upload artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrc-photo-viewer
+          path: ./release/build/*.exe
+
+      - name: echo url
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "Build Success: ${{ steps.upload-artifact.outputs.artifact-url }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
