@@ -26,3 +26,23 @@ jobs:
           echo -n "$APP_NAME $APP_VERSION ($GIT_HASH)" | Out-File -FilePath  .\assets\version.txt -Encoding utf8
           npm run postinstall
           npm run package
+
+      - name: package
+        run: |
+          $APP_NAME=cat .\release\app\package.json | jq -r '.name'
+          $APP_VERSION="pr-${{ github.event.pull_request.number }}"
+          $GIT_HASH=git rev-parse --short HEAD
+          echo -n "$APP_NAME $APP_VERSION ($GIT_HASH)" | Out-File -FilePath  .\assets\version.txt -Encoding utf8
+          npm run postinstall
+          npm run package
+
+      - name: upload artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrc-photo-viewer
+          path: ./release/build/*.exe
+
+      - name: echo url
+        run: |
+          echo "${{ steps.upload-artifact.outputs.artifact-url }}"
