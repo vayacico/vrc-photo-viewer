@@ -597,7 +597,11 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
   });
   // アプリケーションバージョンの取得
   ipcMain.handle('GET_APPLICATION_VERSION', async () => {
-    return (await fs.readFile(getAssetPath('version.txt'), 'utf-8')).trim();
+    try {
+      return (await fs.readFile(getAssetPath('version.txt'), 'utf-8')).trim();
+    } catch (e) {
+      return 'unknown';
+    }
   });
   // ライセンスファイルを開く
   ipcMain.handle('OPEN_LICENCE_FILE', async () => {
