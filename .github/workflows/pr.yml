@@ -36,6 +36,6 @@ jobs:
 
       - name: echo url
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "Build Success: ${{ steps.upload-artifact.outputs.artifact_url }}"
+          gh pr comment ${{ github.event.pull_request.number }} --body "Build Success: ${{ steps.upload-artifact.outputs.artifact-url }}"
         env:
           GH_TOKEN: ${{ github.token }}
