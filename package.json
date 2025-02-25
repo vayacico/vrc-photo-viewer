@@ -235,7 +235,7 @@
     "react-router-dom": "^6.6.1",
     "react-window": "^1.8.8",
     "redux": "^4.2.0",
-    "styled-components": "^5.3.6"
+    "styled-components": "^6.1.0"
   },
   "devEngines": {
     "node": ">=14.x",
