@@ -42,16 +42,16 @@ export default class ActivityService {
    */
   public async getPhotos(): Promise<PhotoLog[]> {
     // 設定を取得
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
     // Joinログを取得
     const joinLog =
-      databasePath.length === 1
-        ? await this.activityLogRepository.getAllJoinLog(databasePath[0])
-        : await this.multiActivityLogRepository.getAllJoinLog(databasePath);
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getAllJoinLog(databasePaths[0])
+        : await this.multiActivityLogRepository.getAllJoinLog(databasePaths);
 
     // Joinログと写真を突合（高負荷になるとUIが固まるので意図的にPromise.allを使わない）
     const result: PhotoLog[] = [];
@@ -82,7 +82,7 @@ export default class ActivityService {
    */
   async getWorlds(): Promise<WorldData[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -118,7 +118,7 @@ export default class ActivityService {
    */
   async getUsers(from: Date, to: Date): Promise<string[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
     const userLogs =
@@ -142,7 +142,7 @@ export default class ActivityService {
    */
   public async searchPhotosByUserName(keyword: string): Promise<PhotoLog[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -206,7 +206,7 @@ export default class ActivityService {
    */
   public async searchPhotosByWorldName(keyword: string): Promise<PhotoLog[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -275,7 +275,7 @@ export default class ActivityService {
    */
   public async searchWorldsByUserName(keyword: string): Promise<WorldData[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -322,7 +322,7 @@ export default class ActivityService {
    */
   public async searchWorldsByWorldName(keyword: string): Promise<WorldData[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -369,7 +369,7 @@ export default class ActivityService {
    */
   async getWorldSuggestion(keyword: string): Promise<string[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -387,7 +387,7 @@ export default class ActivityService {
    */
   async getUserSuggestion(keyword: string): Promise<string[]> {
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 

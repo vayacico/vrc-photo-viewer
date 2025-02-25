@@ -60,7 +60,7 @@ export default class StatisticsService {
   ): Promise<ActivityStatisticsData[]> {
     // 設定を取得
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -139,7 +139,7 @@ export default class StatisticsService {
   ): Promise<WorldJoinStatisticsData[]> {
     // 設定を取得
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -172,7 +172,7 @@ export default class StatisticsService {
   ): Promise<UserJoinStatisticsData[]> {
     // 設定を取得
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -210,7 +210,7 @@ export default class StatisticsService {
   ): Promise<WorldTypeJoinStatisticsData[]> {
     // 設定を取得
     const databasePaths = await this.settingRepository.getDbFileLocation();
-    if (!databasePaths) {
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
