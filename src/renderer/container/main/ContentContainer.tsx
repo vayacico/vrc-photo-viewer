@@ -196,7 +196,7 @@ const ContentContainer: React.FC<Props> = (props) => {
 
       const databaseFilePath =
         await window.service.settings.getDbFileLocation();
-      if (!databaseFilePath) {
+      if (!databaseFilePath || databaseFilePath.length === 0) {
         toast({
           title: t('toast.notConfigured.heading'),
           description: t('toast.notConfigured.description'),
