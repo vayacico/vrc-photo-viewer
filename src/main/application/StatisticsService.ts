@@ -5,18 +5,22 @@ import {
   WorldJoinStatisticsData,
   WorldTypeJoinStatisticsData,
 } from '../../dto/ActivityStatisticsData';
-import ActivityLogRepository from '../domain/model/ActivityLogRepository';
 import PhotoFileRepository from '../domain/model/PhotoFileRepository';
 import SettingRepository from '../domain/model/SettingRepository';
 import InternalDatabaseRepository from '../domain/model/InternalDatabaseRepository';
-import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 import PhotoFileRepositoryImpl from '../infrastructures/repository/PhotoFileRepositoryImpl';
 import SettingsRepositoryImpl from '../infrastructures/repository/SettingsRepositoryImpl';
 import InternalDatabaseRepositoryImpl from '../infrastructures/repository/InternalDatabaseRepositoryImpl';
 import DatabaseFilePathNotSetException from '../domain/model/exception/DatabaseFilePathNotSetException';
+import MultiActivityLogRepository from '../domain/model/MultiActivityLogRepository';
+import MultiActivityLogRepositoryImpl from '../infrastructures/repository/MultiActivityLogRepositoryImpl';
+import ActivityLogRepository from '../domain/model/ActivityLogRepository';
+import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 
 export default class StatisticsService {
   activityLogRepository: ActivityLogRepository;
+
+  multiActivityLogRepository: MultiActivityLogRepository;
 
   photoFileRepository: PhotoFileRepository;
 
@@ -26,6 +30,7 @@ export default class StatisticsService {
 
   constructor() {
     this.activityLogRepository = new ActivityLogRepositoryImpl();
+    this.multiActivityLogRepository = new MultiActivityLogRepositoryImpl();
     this.photoFileRepository = new PhotoFileRepositoryImpl();
     this.settingRepository = new SettingsRepositoryImpl();
     this.internalDatabaseRepository = new InternalDatabaseRepositoryImpl();
@@ -54,18 +59,24 @@ export default class StatisticsService {
     to: Date
   ): Promise<ActivityStatisticsData[]> {
     // 設定を取得
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
     // アクティビティログのタイムスタンプリストを取得
     const activityLogTimeStamps =
-      await this.activityLogRepository.getActivityLogTimestamps(
-        databasePath,
-        from,
-        to
-      );
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getActivityLogTimestamps(
+            databasePaths[0],
+            from,
+            to
+          )
+        : await this.multiActivityLogRepository.getActivityLogTimestamps(
+            databasePaths,
+            from,
+            to
+          );
 
     // 写真のタイムスタンプリストを取得
     const photoTimeStamps =
@@ -127,17 +138,24 @@ export default class StatisticsService {
     to: Date
   ): Promise<WorldJoinStatisticsData[]> {
     // 設定を取得
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
     // ワールドごとの訪問回数を取得
-    const worldJoinCount = await this.activityLogRepository.getWorldJoinCount(
-      databasePath,
-      from,
-      to
-    );
+    const worldJoinCount =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getWorldJoinCount(
+            databasePaths[0],
+            from,
+            to
+          )
+        : await this.multiActivityLogRepository.getWorldJoinCount(
+            databasePaths,
+            from,
+            to
+          );
 
     // 結果を返却
     return worldJoinCount.map((data) => {
@@ -153,17 +171,24 @@ export default class StatisticsService {
     to: Date
   ): Promise<UserJoinStatisticsData[]> {
     // 設定を取得
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
     // ユーザごとの訪問回数を取得
-    const userJoinCount = await this.activityLogRepository.getUserJoinCount(
-      databasePath,
-      from,
-      to
-    );
+    const userJoinCount =
+      databasePaths.length === 1
+        ? await this.activityLogRepository.getUserJoinCount(
+            databasePaths[0],
+            from,
+            to
+          )
+        : await this.multiActivityLogRepository.getUserJoinCount(
+            databasePaths,
+            from,
+            to
+          );
 
     // 結果を返却
     return userJoinCount.map((data) => {
@@ -184,8 +209,8 @@ export default class StatisticsService {
     to: Date
   ): Promise<WorldTypeJoinStatisticsData[]> {
     // 設定を取得
-    const databasePath = await this.settingRepository.getDbFileLocation();
-    if (!databasePath) {
+    const databasePaths = await this.settingRepository.getDbFileLocation();
+    if (!databasePaths || databasePaths.length === 0) {
       throw new DatabaseFilePathNotSetException();
     }
 
@@ -193,51 +218,91 @@ export default class StatisticsService {
     const result: WorldTypeJoinStatisticsData[] = [];
     result.push({
       type: 'PUBLIC',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'PUBLIC', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'PUBLIC', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'PUBLIC', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'FRIEND_PLUS',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'FRIEND_PLUS', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'FRIEND_PLUS', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'FRIEND_PLUS', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'FRIEND',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'FRIEND', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 0
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'FRIEND', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'FRIEND', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'INVITE_PLUS',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'INVITE_PLUS', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'INVITE_PLUS', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'INVITE_PLUS', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'INVITE',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'INVITE', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'INVITE', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'INVITE', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'GROUP',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'GROUP', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'GROUP', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'GROUP', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'GROUP_PLUS',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'GROUP_PLUS', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'GROUP_PLUS', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'GROUP_PLUS', from, to)
+              .then((ids) => ids.length),
     });
     result.push({
       type: 'GROUP_PUBLIC',
-      count: await this.activityLogRepository
-        .getInstanceIds(databasePath, 'GROUP_PUBLIC', from, to)
-        .then((ids) => ids.length),
+      count:
+        databasePaths.length === 1
+          ? await this.activityLogRepository
+              .getInstanceIds(databasePaths[0], 'GROUP_PUBLIC', from, to)
+              .then((ids) => ids.length)
+          : await this.multiActivityLogRepository
+              .getInstanceIds(databasePaths, 'GROUP_PUBLIC', from, to)
+              .then((ids) => ids.length),
     });
     return result;
   }

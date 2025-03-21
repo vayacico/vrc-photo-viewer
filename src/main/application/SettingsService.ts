@@ -3,6 +3,8 @@ import { dialog } from 'electron';
 import SettingsRepositoryImpl from '../infrastructures/repository/SettingsRepositoryImpl';
 import SettingRepository from '../domain/model/SettingRepository';
 import { SettingForm } from '../../dto/SettingForm';
+import MultiActivityLogRepository from '../domain/model/MultiActivityLogRepository';
+import MultiActivityLogRepositoryImpl from '../infrastructures/repository/MultiActivityLogRepositoryImpl';
 import ActivityLogRepository from '../domain/model/ActivityLogRepository';
 import ActivityLogRepositoryImpl from '../infrastructures/repository/ActivityLogRepositoryImpl';
 
@@ -11,9 +13,12 @@ export default class SettingsService {
 
   activityLogRepository: ActivityLogRepository;
 
+  multiActivityLogRepository: MultiActivityLogRepository;
+
   constructor() {
     this.settingRepository = new SettingsRepositoryImpl();
     this.activityLogRepository = new ActivityLogRepositoryImpl();
+    this.multiActivityLogRepository = new MultiActivityLogRepositoryImpl();
   }
 
   /**
@@ -27,7 +32,7 @@ export default class SettingsService {
   /**
    * 設定されているDBファイルのパスを取得する
    */
-  async getDbFileLocation(): Promise<string> {
+  async getDbFileLocation(): Promise<string[]> {
     return this.settingRepository.getDbFileLocation();
   }
 
@@ -44,9 +49,15 @@ export default class SettingsService {
    */
   async applySetting(settingForm: SettingForm): Promise<void> {
     // 読み込みのテストを行う(発生した例外はインターフェイス層で補足してレスポンスに変換)
-    await this.activityLogRepository.getAllJoinLog(
-      settingForm.databaseFilePath
-    );
+    if (settingForm.databaseFilePath.length === 1) {
+      await this.activityLogRepository.getAllJoinLog(
+        settingForm.databaseFilePath[0]
+      );
+    } else {
+      await this.multiActivityLogRepository.getAllJoinLog(
+        settingForm.databaseFilePath
+      );
+    }
 
     // 設定値の書き込み
     await this.settingRepository.updatePhotoDirectoryLocations(
