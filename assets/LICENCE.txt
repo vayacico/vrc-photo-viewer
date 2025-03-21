@@ -1045,7 +1045,7 @@ third-party archives.
    limitations under the License.
 
 
-sqlite3 5.1.7
+sqlite3 5.1.6
 BSD-3-Clause
 Copyright (c) MapBox
 All rights reserved.
