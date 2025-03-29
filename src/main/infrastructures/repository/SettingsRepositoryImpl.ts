@@ -3,6 +3,7 @@ import SettingRepository from '../../domain/model/SettingRepository';
 
 type SettingType = {
   db: string;
+  dbList: string[];
   photo: string[];
   language: 'ja' | 'en';
   showVideoUrls: boolean;
@@ -68,8 +69,18 @@ export default class SettingsRepositoryImpl implements SettingRepository {
   /**
    * 設定されているActivityLogToolsのパスを取得
    */
-  async getDbFileLocation(): Promise<string> {
-    return this.store.get('db');
+  async getDbFileLocation(): Promise<string[]> {
+    const dbPathList = this.store.get('dbList');
+    if (dbPathList) {
+      return dbPathList;
+    }
+
+    // 旧バージョンで設定されている場合はそのパスを返す
+    const oldDbPath = this.store.get('db');
+    if (oldDbPath) {
+      return [oldDbPath];
+    }
+    return [];
   }
 
   /**
@@ -95,7 +106,7 @@ export default class SettingsRepositoryImpl implements SettingRepository {
    * ActivityLogToolsのパスを設定
    * @param path
    */
-  async updateDbFileLocation(path: string): Promise<void> {
-    this.store.set('db', path);
+  async updateDbFileLocation(path: string[]): Promise<void> {
+    this.store.set('dbList', path);
   }
 }
