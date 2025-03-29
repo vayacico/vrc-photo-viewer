@@ -13,6 +13,38 @@ export default class ActivityLogRepositoryImpl
   implements ActivityLogRepository
 {
   /**
+   * 指定期間内の動画URLを取得する
+   * @param path DBのパス
+   * @param from 開始日時
+   * @param to 終了日時
+   */
+  public async getVideoUrls(
+    path: string,
+    from: Date,
+    to: Date
+  ): Promise<string[]> {
+    const dataSource = new DataSource({
+      type: 'sqlite',
+      database: path,
+      flags: OPEN_READONLY,
+    });
+    await dataSource.initialize();
+
+    // ActivityType=13のURLを取得（DISTINCTで重複を除去）
+    const result: {
+      Url: string;
+    }[] = await dataSource.query(
+      'SELECT DISTINCT Url from ActivityLogs WHERE ActivityType = 13 AND ? <= Timestamp AND Timestamp <= ? ORDER BY Timestamp',
+      [
+        moment(from).format('YYYY-MM-DD HH:mm:ss'),
+        moment(to).format('YYYY-MM-DD HH:mm:ss'),
+      ]
+    );
+    await dataSource.destroy();
+
+    return result.map((item) => item.Url).filter((url) => url !== null && url !== '');
+  }
+  /**
    * DBから該当期間にログのあるユーザーを取得する
    * @param path
    * @param from

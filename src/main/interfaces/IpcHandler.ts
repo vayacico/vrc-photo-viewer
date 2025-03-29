@@ -136,6 +136,26 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
       } as ErrorResponse;
     }
   });
+  // 動画URLリスト取得
+  ipcMain.handle('GET_VIDEO_URLS', async (_event, from: Date, to: Date) => {
+    try {
+      return await activityService.getVideoUrls(from, to);
+    } catch (e) {
+      if (e instanceof DatabaseErrorException) {
+        console.log(e);
+        return {
+          status: 'failed',
+          errorCode: 'FILE_INVALID',
+          message: e.message,
+        } as ErrorResponse;
+      }
+      return {
+        status: 'failed',
+        errorCode: 'UNKNOWN',
+        message: `${e}`,
+      } as ErrorResponse;
+    }
+  });
   // ワールドリスト取得
   ipcMain.handle('GET_WORLDS', async () => {
     try {
@@ -547,6 +567,14 @@ const registerHandler = (browserWindow: BrowserWindow | null) => {
   // 言語設定変更
   ipcMain.handle('UPDATE_LANGUAGE', async (_event, lng: 'ja' | 'en') => {
     return settingService.updateLanguageSetting(lng);
+  });
+  // 動画URL表示設定取得
+  ipcMain.handle('GET_SHOW_VIDEO_URLS', async () => {
+    return settingService.getShowVideoUrlsSetting();
+  });
+  // 動画URL表示設定変更
+  ipcMain.handle('UPDATE_SHOW_VIDEO_URLS', async (_event, show: boolean) => {
+    return settingService.updateShowVideoUrlsSetting(show);
   });
   // URLをブラウザで開く
   ipcMain.handle('APPLICATION_OPEN_IN_BROWSER', async (_event, url: string) => {

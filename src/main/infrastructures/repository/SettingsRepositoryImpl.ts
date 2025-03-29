@@ -4,6 +4,8 @@ import SettingRepository from '../../domain/model/SettingRepository';
 type SettingType = {
   db: string;
   photo: string[];
+  language: 'ja' | 'en';
+  showVideoUrls: boolean;
 };
 
 export default class SettingsRepositoryImpl implements SettingRepository {
@@ -33,6 +35,26 @@ export default class SettingsRepositoryImpl implements SettingRepository {
       return 'ja';
     } catch (e) {
       return 'en';
+    }
+  }
+
+  /**
+   * 動画URL表示設定を更新
+   * @param show
+   */
+  async updateShowVideoUrls(show: boolean): Promise<void> {
+    this.store.set('showVideoUrls', show);
+  }
+
+  /**
+   * 動画URL表示設定を取得
+   */
+  async getShowVideoUrls(): Promise<boolean> {
+    try {
+      const result = this.store.get('showVideoUrls');
+      return result === true;
+    } catch (e) {
+      return true; // デフォルトは表示する
     }
   }
 

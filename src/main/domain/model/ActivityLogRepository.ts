@@ -5,6 +5,7 @@ import { UserJoinCount, WorldJoinCount } from '../../../dto/ActivityLog';
 import { InstanceType } from '../../../dto/ActivityStatisticsData';
 
 export default interface ActivityLogRepository {
+  getVideoUrls(path: string, from: Date, to: Date): Promise<string[]>;
   getUserJoinLog(path: string, from: Date, to: Date): Promise<UserLog[]>;
 
   getAllJoinLog(path: string): Promise<WorldSearchResult[]>;

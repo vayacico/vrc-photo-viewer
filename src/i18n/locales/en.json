@@ -47,6 +47,11 @@
       "heading": "Language",
       "description": "Select your preferred language for the application interface from the list."
     },
+    "display": {
+      "heading": "Display Settings",
+      "description": "Configure display settings for the application",
+      "showVideoUrls": "Show video URLs"
+    },
     "settingFile": {
       "heading": "Settings File",
       "description": "Open and edit the application's configuration file (in JSON format).",

@@ -42,6 +42,7 @@ const SettingContainer: React.FC<Props> = (props) => {
     [] as string[]
   );
   const [version, setVersion] = useState('');
+  const [showVideoUrls, setShowVideoUrls] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [applyStatus, setApplyStatus] = useState<
     'NOT_YET' | 'LOADING' | 'SUCCESS' | 'ERROR'
@@ -66,11 +67,12 @@ const SettingContainer: React.FC<Props> = (props) => {
     setVersion(result);
   };
 
-  // 表示時に各パスを取得
+  // 表示時に各設定を取得
   useEffect(() => {
     getDatabaseFilePath();
     getPhotoDirectoryPaths();
     getVersionText();
+    getShowVideoUrlsSetting();
   }, []);
 
   useEffect(() => {
@@ -126,10 +128,31 @@ const SettingContainer: React.FC<Props> = (props) => {
     }
   };
 
+  const getShowVideoUrlsSetting = async () => {
+    try {
+      // @ts-ignore - TypeScriptの型定義エラーを無視
+      const show = await window.service.settings.getShowVideoUrlsSetting();
+      setShowVideoUrls(show);
+    } catch (error) {
+      console.error('Error fetching video URL settings:', error);
+      setShowVideoUrls(true); // デフォルトは表示する
+    }
+  };
+
   const setLanguage = async (lng: string) => {
     if (lng === 'ja' || lng === 'en') {
       await i18n.changeLanguage(lng);
       await window.service.settings.updateLanguageSetting(lng);
+    }
+  };
+
+  const updateShowVideoUrls = async (show: boolean) => {
+    setShowVideoUrls(show);
+    try {
+      // @ts-ignore - TypeScriptの型定義エラーを無視
+      await window.service.settings.updateShowVideoUrlsSetting(show);
+    } catch (error) {
+      console.error('Error updating video URL settings:', error);
     }
   };
 
@@ -139,7 +162,9 @@ const SettingContainer: React.FC<Props> = (props) => {
       databaseFilePath={databaseFilePath}
       photoDirectoryPaths={photoDirectoryPaths}
       language={i18n.language}
+      showVideoUrls={showVideoUrls}
       setLanguage={setLanguage}
+      setShowVideoUrls={updateShowVideoUrls}
       showUpdateDatabaseFilePathDialog={showUpdateDatabaseFilePathDialog}
       showAddPhotoDirectoryDialog={showAddPhotoDirectoryDialog}
       deletePhotoDirectoryPath={deletePhotoDirectoryPath}

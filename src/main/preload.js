@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('service', {
     getUsers(from, to) {
       return ipcRenderer.invoke('GET_USERS', from, to);
     },
+    getVideoUrls(from, to) {
+      return ipcRenderer.invoke('GET_VIDEO_URLS', from, to);
+    },
     scanPhoto(refresh) {
       return ipcRenderer.invoke('SCAN_PHOTOS', refresh);
     },
@@ -84,6 +87,12 @@ contextBridge.exposeInMainWorld('service', {
     },
     updateLanguageSetting(language) {
       return ipcRenderer.invoke('UPDATE_LANGUAGE', language);
+    },
+    getShowVideoUrlsSetting() {
+      return ipcRenderer.invoke('GET_SHOW_VIDEO_URLS');
+    },
+    updateShowVideoUrlsSetting(show) {
+      return ipcRenderer.invoke('UPDATE_SHOW_VIDEO_URLS', show);
     },
   },
   application: {

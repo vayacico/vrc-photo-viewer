@@ -29,9 +29,9 @@ const PhotoDetailContainer: React.FC = () => {
       ? selectedListIndex
       : selectedSearchIndex;
 
-  const { data } = useQuery<string[]>(
+  const { data: userData } = useQuery<string[]>(
     targetList !== null
-      ? `${targetList[targetIndex].instanceId}-${targetList[targetIndex].joinDate}-${targetList[targetIndex].createdDate}`
+      ? `users-${targetList[targetIndex].instanceId}-${targetList[targetIndex].joinDate}-${targetList[targetIndex].createdDate}`
       : 'NO_DATA',
     () => {
       if (targetList !== null) {
@@ -44,7 +44,37 @@ const PhotoDetailContainer: React.FC = () => {
     }
   );
 
-  const users = data ?? [];
+  const { data: videoUrlData } = useQuery<string[]>(
+    targetList !== null
+      ? `videos-${targetList[targetIndex].instanceId}-${targetList[targetIndex].joinDate}-${targetList[targetIndex].createdDate}`
+      : 'NO_DATA',
+    () => {
+      if (targetList !== null) {
+        return window.service.log.getVideoUrls(
+          targetList[targetIndex].joinDate,
+          targetList[targetIndex].createdDate
+        );
+      }
+      return [];
+    }
+  );
+
+  const { data: showVideoUrlsSetting } = useQuery<boolean>(
+    'show-video-urls-setting',
+    async () => {
+      try {
+        // @ts-ignore - TypeScriptの型定義エラーを無視
+        return await window.service.settings.getShowVideoUrlsSetting();
+      } catch (error) {
+        console.error('Error fetching video URL settings:', error);
+        return true; // デフォルトは表示する
+      }
+    }
+  );
+
+  const users = userData ?? [];
+  // 重複を取り除く
+  const videoUrls = showVideoUrlsSetting === false ? [] : Array.from(new Set(videoUrlData ?? []));
 
   const setStatus = (text: string) => {
     dispatch(statusActions.setStatus({ text }));
@@ -170,6 +200,7 @@ const PhotoDetailContainer: React.FC = () => {
           createdDate={targetList[targetIndex].createdDate}
           originalFilePath={targetList[targetIndex].originalFilePath}
           users={users}
+          videoUrls={videoUrls}
           setStatus={setStatus}
         />
       ) : null}

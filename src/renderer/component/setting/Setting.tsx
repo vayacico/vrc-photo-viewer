@@ -5,6 +5,7 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Checkbox,
   Icon,
   Select,
   Tab,
@@ -23,7 +24,9 @@ interface Props {
 
   isScanning: boolean;
   language: string;
+  showVideoUrls: boolean;
   setLanguage: (lang: string) => void;
+  setShowVideoUrls: (show: boolean) => void;
   errorMessage: string | null;
   version: string;
   showUpdateDatabaseFilePathDialog: () => Promise<void>;
@@ -172,9 +175,9 @@ const LinkText = styled.a`
 const Setting: React.FC<Props> = (props) => {
   const { t } = useTranslation();
 
-  const photoDirectoryBoxes = props.photoDirectoryPaths.map((item) => {
+  const photoDirectoryBoxes = props.photoDirectoryPaths.map((item, index) => {
     return (
-      <PathArea>
+      <PathArea key={`path-${index}`}>
         <Path> {item}</Path>
         <DeleteIcon onClick={() => props.deletePhotoDirectoryPath(item)}>
           <BsX />
@@ -289,6 +292,16 @@ const Setting: React.FC<Props> = (props) => {
                 <option value="en">English</option>
                 <option value="ja">日本語</option>
               </Select>
+            </Area>
+            <Area>
+              <Heading>{t('setting.display.heading')}</Heading>
+              <Description>{t('setting.display.description')}</Description>
+              <Checkbox
+                isChecked={props.showVideoUrls}
+                onChange={(e) => props.setShowVideoUrls(e.target.checked)}
+              >
+                {t('setting.display.showVideoUrls')}
+              </Checkbox>
             </Area>
             <Area>
               <Heading>{t('setting.settingFile.heading')}</Heading>

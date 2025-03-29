@@ -33,6 +33,22 @@ export default class ActivityService {
   }
 
   /**
+   * 該当期間の動画URLリストを取得
+   * @param from 開始日時
+   * @param to 終了日時
+   */
+  public async getVideoUrls(from: Date, to: Date): Promise<string[]> {
+    // 設定を取得
+    const databasePath = await this.settingRepository.getDbFileLocation();
+    if (!databasePath) {
+      throw new DatabaseFilePathNotSetException();
+    }
+
+    // 動画URLを取得
+    return this.activityLogRepository.getVideoUrls(databasePath, from, to);
+  }
+
+  /**
    * 該当期間の写真リストを取得
    */
   public async getPhotos(): Promise<PhotoLog[]> {
