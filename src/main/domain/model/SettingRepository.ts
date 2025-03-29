@@ -7,9 +7,13 @@ export default interface SettingRepository {
 
   getLanguage(): Promise<'ja' | 'en'>;
 
+  getShowVideoUrls(): Promise<boolean>;
+
   updateDbFileLocation(path: string[]): Promise<void>;
 
   updatePhotoDirectoryLocations(paths: string[]): Promise<void>;
 
   updateLanguage(lng: 'ja' | 'en'): Promise<void>;
+
+  updateShowVideoUrls(show: boolean): Promise<void>;
 }

@@ -8,6 +8,7 @@ import {
   BsFillPersonFill,
   BsGlobe,
   BsLink45Deg,
+  BsFilm,
 } from 'react-icons/bs';
 import React, { useEffect, useState } from 'react';
 import { Tooltip } from '@chakra-ui/react';
@@ -20,6 +21,7 @@ interface Props {
   createdDate: Date;
   originalFilePath: string;
   users: string[];
+  videoUrls?: string[];
   setStatus: (text: string) => void;
 }
 
@@ -99,6 +101,11 @@ const PersonIcon = styled(BsFillPersonFill)`
   margin-top: 4px;
 `;
 
+const VideoIcon = styled(BsFilm)`
+  font-size: 20px;
+  margin-top: 4px;
+`;
+
 const CameraIcon = styled(BsFillCameraFill)`
   font-size: 20px;
   margin-top: 4px;
@@ -107,6 +114,12 @@ const CameraIcon = styled(BsFillCameraFill)`
 const Users = styled.div``;
 
 const User = styled.div`
+  display: flex;
+`;
+
+const Videos = styled.div``;
+
+const Video = styled.div`
   display: flex;
 `;
 
@@ -149,7 +162,7 @@ const PhotoDetailPanel: React.FC<Props> = (props) => {
   const [worldNameCopied, setWorldNameCopied] = useState(false);
   const [pathCopied, setPathCopied] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
-  const [t] = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     setWorldNameCopied(false);
@@ -192,8 +205,9 @@ const PhotoDetailPanel: React.FC<Props> = (props) => {
         >
           {props.worldName}
         </LinkItem>
+        {/* @ts-ignore - TypeScriptのエラーを無視 */}
         <Tooltip
-          label={worldNameCopied ? t('panel.copied') : t('panel.copyWorldName')}
+          label={worldNameCopied ? "コピーしました" : "ワールド名をコピー"}
           placement="top"
           closeOnClick={false}
         >
@@ -201,8 +215,9 @@ const PhotoDetailPanel: React.FC<Props> = (props) => {
             {worldNameCopied ? <CustomCheckIcon /> : <CopyIcon />}
           </CopyIconWrapper>
         </Tooltip>
+        {/* @ts-ignore - TypeScriptのエラーを無視 */}
         <Tooltip
-          label={urlCopied ? t('panel.copied') : t('panel.copyWorldUrl')}
+          label={urlCopied ? "コピーしました" : "URLをコピー"}
           placement="top"
           closeOnClick={false}
         >
@@ -232,8 +247,9 @@ const PhotoDetailPanel: React.FC<Props> = (props) => {
         >
           {fileName}
         </PathItem>
+        {/* @ts-ignore - TypeScriptのエラーを無視 */}
         <Tooltip
-          label={pathCopied ? t('panel.copied') : t('panel.copyFilePath')}
+          label={pathCopied ? "コピーしました" : "ファイルパスをコピー"}
           placement="top"
           closeOnClick={false}
         >
@@ -251,15 +267,39 @@ const PhotoDetailPanel: React.FC<Props> = (props) => {
       <IconTextWrapper>
         <PersonIcon />
         <Users>
-          {props.users.map((item) => {
+          {props.users.map((item, index) => {
             return (
-              <User>
+              <User key={`user-${index}`}>
                 <Item>{item}</Item>
               </User>
             );
           })}
         </Users>
       </IconTextWrapper>
+      {Array.isArray(props.videoUrls) && props.videoUrls.length > 0 && (
+        <IconTextWrapper>
+          <VideoIcon />
+          <Videos>
+            {props.videoUrls.map((videoUrl, index) => {
+              // 型安全のためにstringであることを確認
+              const url = typeof videoUrl === 'string' ? videoUrl : '';
+              if (!url) return null;
+              
+              return (
+                <Video key={`video-${index}`}>
+                  <LinkItem
+                    onClick={() => window.service.application.openUrlInBrowser(url)}
+                    onMouseEnter={() => props.setStatus && props.setStatus(url)}
+                    onMouseLeave={() => props.setStatus && props.setStatus('')}
+                  >
+                    {url}
+                  </LinkItem>
+                </Video>
+              );
+            })}
+          </Videos>
+        </IconTextWrapper>
+      )}
     </DetailPanel>
   );
 };

@@ -47,6 +47,11 @@
       "heading": "表示言語",
       "description": "アプリの表示言語を選択してください"
     },
+    "display": {
+      "heading": "表示設定",
+      "description": "アプリの表示に関する設定を行います",
+      "showVideoUrls": "動画URLを表示する"
+    },
     "settingFile": {
       "heading": "設定ファイル編集",
       "description": "アプリの設定ファイル（JSON形式）を開いて編集することができます",

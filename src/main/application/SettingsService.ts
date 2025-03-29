@@ -116,4 +116,19 @@ export default class SettingsService {
   async updateLanguageSetting(lng: 'ja' | 'en'): Promise<void> {
     return this.settingRepository.updateLanguage(lng);
   }
+
+  /**
+   * 動画URL表示設定を取得
+   */
+  async getShowVideoUrlsSetting(): Promise<boolean> {
+    return this.settingRepository.getShowVideoUrls();
+  }
+
+  /**
+   * 動画URL表示設定を更新
+   * @param show
+   */
+  async updateShowVideoUrlsSetting(show: boolean): Promise<void> {
+    return this.settingRepository.updateShowVideoUrls(show);
+  }
 }
